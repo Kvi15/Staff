@@ -67,7 +67,11 @@ class _ChangePersonListState extends State<ChangePersonList> {
       imagePath: _image?.path,
     );
 
-    Hive.box<User>('users').put(widget.user.key, updatedUser);
+    // Проверка на null для ключа
+    final key = widget.user.key;
+    if (key != null) {
+      Hive.box<User>('users').put(key, updatedUser);
+    }
 
     Navigator.of(context).pop();
   }

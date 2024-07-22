@@ -16,6 +16,7 @@ class _AddingAPersonState extends State<AddingAPerson> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   bool _isSearching = false;
+  List<User> _filteredUsers = [];
 
   @override
   void initState() {
@@ -23,11 +24,13 @@ class _AddingAPersonState extends State<AddingAPerson> {
     userBox = Hive.box<User>('users');
     _searchController.addListener(_updateSearchState);
     _searchFocusNode.addListener(_handleFocusChange);
+    _filteredUsers = userBox.values.toList();
   }
 
   void _addUser(User user) {
     setState(() {
       userBox.add(user);
+      _filteredUsers = userBox.values.toList();
     });
   }
 
@@ -43,7 +46,21 @@ class _AddingAPersonState extends State<AddingAPerson> {
   }
 
   void _updateSearchState() {
-    setState(() {});
+    setState(() {
+      if (_searchController.text.isEmpty) {
+        _filteredUsers = userBox.values.toList();
+      } else {
+        _filteredUsers = userBox.values
+            .where((user) =>
+                user.surname.contains(_searchController.text) ||
+                user.name.contains(_searchController.text) ||
+                user.patronymic.contains(_searchController.text) ||
+                user.number.contains(_searchController.text) ||
+                user.deviceDate.contains(_searchController.text) ||
+                user.medicalBook.contains(_searchController.text))
+            .toList();
+      }
+    });
   }
 
   void _handleFocusChange() {
@@ -136,8 +153,9 @@ class _AddingAPersonState extends State<AddingAPerson> {
                   ),
                 ),
               ),
-              const BuildPersonListView(
+              BuildPersonListView(
                 scrollOffset: 0.0,
+                users: _filteredUsers,
               ),
             ],
           ),

@@ -7,10 +7,12 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 class BuildPersonListView extends StatefulWidget {
   final double scrollOffset;
+  final List<User> users;
 
   const BuildPersonListView({
     super.key,
     this.scrollOffset = 0.0,
+    required this.users,
   });
 
   @override
@@ -36,146 +38,136 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: userBox.listenable(),
-      builder: (context, Box<User> box, _) {
-        List<User> users = box.values.toList().cast<User>();
-        users.sort((a, b) =>
-            b.key.compareTo(a.key)); // Сортировка по ключу в обратном порядке
+    final userCount = widget.users.length;
 
-        return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final user = users[index];
-              return Center(
-                child: Container(
-                  height: 200,
-                  margin: EdgeInsets.fromLTRB(
-                    40,
-                    index == 0
-                        ? MediaQuery.of(context).size.height *
-                            widget.scrollOffset
-                        : 0,
-                    40,
-                    index == users.length - 1 ? 80 : 20,
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          final user = widget.users[index];
+          return Center(
+            child: Container(
+              height: 200,
+              margin: EdgeInsets.fromLTRB(
+                40,
+                index == 0
+                    ? MediaQuery.of(context).size.height * widget.scrollOffset
+                    : 0,
+                40,
+                index == userCount - 1 ? 80 : 20,
+              ),
+              decoration: BoxDecoration(
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color.fromARGB(255, 3, 3, 3),
+                    spreadRadius: 3,
+                    blurRadius: 5,
+                    offset: Offset(0, 3),
                   ),
-                  decoration: BoxDecoration(
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color.fromARGB(255, 3, 3, 3),
-                        spreadRadius: 3,
-                        blurRadius: 5,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                    color: const Color.fromARGB(255, 255, 255, 255),
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: Stack(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
-                        child: Column(
+                ],
+                color: const Color.fromARGB(255, 255, 255, 255),
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+                    child: Column(
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Row(
+                            SizedBox(
+                              height: 130,
+                              width: 130,
+                              child: user.imagePath != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: Image.file(
+                                        File(user.imagePath!),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : Image.asset(
+                                      'assets/icons/lgv9s1kz-removebg-preview.png',
+                                    ),
+                            ),
+                            const SizedBox(width: 10),
+                            Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                SizedBox(
-                                  height: 130,
-                                  width: 130,
-                                  child: user.imagePath != null
-                                      ? ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          child: Image.file(
-                                            File(user.imagePath!),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        )
-                                      : Image.asset(
-                                          'assets/icons/lgv9s1kz-removebg-preview.png',
-                                        ),
-                                ),
-                                const SizedBox(width: 10),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                Text(user.surname),
+                                const SizedBox(height: 3),
+                                Text(user.name),
+                                const SizedBox(height: 3),
+                                Text(user.patronymic),
+                                const SizedBox(height: 3),
+                                Text(user.number),
+                                const SizedBox(height: 3),
+                                Row(
                                   children: [
-                                    Text(user.surname),
-                                    const SizedBox(height: 3),
-                                    Text(user.name),
-                                    const SizedBox(height: 3),
-                                    Text(user.patronymic),
-                                    const SizedBox(height: 3),
-                                    Text(user.number),
-                                    const SizedBox(height: 3),
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.directions_walk,
-                                          size: 15,
-                                        ),
-                                        Text(user.deviceDate)
-                                      ],
+                                    const Icon(
+                                      Icons.directions_walk,
+                                      size: 15,
                                     ),
-                                    const SizedBox(height: 3),
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.import_contacts,
-                                          size: 15,
-                                        ),
-                                        Text(user.medicalBook),
-                                      ],
+                                    Text(user.deviceDate),
+                                  ],
+                                ),
+                                const SizedBox(height: 3),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.import_contacts,
+                                      size: 15,
                                     ),
+                                    Text(user.medicalBook),
                                   ],
                                 ),
                               ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 40),
-                              child: DayIndicator(
-                                  startDateString: user.deviceDate),
-                            ),
                           ],
                         ),
-                      ),
-                      Positioned(
-                        top: 12,
-                        right: 10,
-                        child: IconButton(
-                          onPressed: () {
-                            _editUser(user);
-                          },
-                          icon: const Icon(
-                            Icons.more_vert,
-                            color: Colors.black,
-                          ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 40),
+                          child: DayIndicator(startDateString: user.deviceDate),
                         ),
-                      ),
-                      Positioned(
-                        bottom: 7,
-                        right: 5,
-                        child: IconButton(
-                          onPressed: () {
-                            _deleteUser(user);
-                          },
-                          icon: const Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-            childCount: users.length,
-          ),
-        );
-      },
+                  Positioned(
+                    top: 12,
+                    right: 10,
+                    child: IconButton(
+                      onPressed: () {
+                        _editUser(user);
+                      },
+                      icon: const Icon(
+                        Icons.more_vert,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 7,
+                    right: 5,
+                    child: IconButton(
+                      onPressed: () {
+                        _deleteUser(user);
+                      },
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+        childCount: userCount,
+      ),
     );
   }
 }
