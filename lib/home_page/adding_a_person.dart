@@ -120,18 +120,25 @@ class _AddingAPersonState extends State<AddingAPerson> {
                 flexibleSpace: FlexibleSpaceBar(
                   centerTitle: true,
                   title: Padding(
-                    padding: const EdgeInsets.fromLTRB(5, 260, 5, 10),
+                    padding: const EdgeInsets.fromLTRB(10, 260, 10, 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _isSearching
                             ? Expanded(
                                 child: TextField(
+                                  textCapitalization: TextCapitalization.words,
                                   controller: _searchController,
                                   focusNode: _searchFocusNode,
-                                  decoration: const InputDecoration(
-                                    hintText: 'Поиск',
-                                  ),
+                                  decoration: InputDecoration(
+                                      hintText: 'Поиск',
+                                      suffixIcon: IconButton(
+                                          onPressed: _searchController.clear,
+                                          icon: const Icon(
+                                            Icons.clear,
+                                            color: Colors.red,
+                                            size: 20,
+                                          ))),
                                 ),
                               )
                             : IconButton(
@@ -141,13 +148,6 @@ class _AddingAPersonState extends State<AddingAPerson> {
                                   size: 25,
                                 ),
                               ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.sort,
-                            size: 25,
-                          ),
-                        ),
                       ],
                     ),
                   ),

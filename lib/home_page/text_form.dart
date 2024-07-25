@@ -143,6 +143,7 @@ class _TextFormState extends State<TextForm> {
                   child: Column(
                     children: <Widget>[
                       TextFormField(
+                        textCapitalization: TextCapitalization.words,
                         controller: _surname,
                         decoration: const InputDecoration(
                           enabledBorder: OutlineInputBorder(
@@ -160,6 +161,7 @@ class _TextFormState extends State<TextForm> {
                       ),
                       const SizedBox(height: 20),
                       TextFormField(
+                        textCapitalization: TextCapitalization.words,
                         controller: _name,
                         decoration: const InputDecoration(
                           labelText: 'Имя',
@@ -177,6 +179,7 @@ class _TextFormState extends State<TextForm> {
                       ),
                       const SizedBox(height: 20),
                       TextFormField(
+                        textCapitalization: TextCapitalization.words,
                         controller: _patronymic,
                         decoration: const InputDecoration(
                           labelText: 'Отчество',

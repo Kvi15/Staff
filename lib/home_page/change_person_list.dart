@@ -136,14 +136,17 @@ class _ChangePersonListState extends State<ChangePersonList> {
                   ),
                 ),
                 TextField(
+                  textCapitalization: TextCapitalization.words,
                   controller: _surnameController,
                   decoration: const InputDecoration(labelText: 'Фамилия'),
                 ),
                 TextField(
+                  textCapitalization: TextCapitalization.words,
                   controller: _nameController,
                   decoration: const InputDecoration(labelText: 'Имя'),
                 ),
                 TextField(
+                  textCapitalization: TextCapitalization.words,
                   controller: _patronymicController,
                   decoration: const InputDecoration(labelText: 'Отчество'),
                 ),
