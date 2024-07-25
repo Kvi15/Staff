@@ -12,9 +12,6 @@ void main() async {
   // Открываем коробку (Box) пользователей
   var userBox = await Hive.openBox<User>('users');
 
-  // Обновляем существующих пользователей
-  updateExistingUsers(userBox);
-
   // Запускаем приложение
   runApp(const MyApp());
 }

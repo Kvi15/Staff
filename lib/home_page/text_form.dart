@@ -4,9 +4,35 @@ import 'package:flutter_staff/home_page/user.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+// Форматтер для ввода даты в формате dd.MM.yyyy
+class DateInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    // Убираем все символы, кроме цифр
+    String newText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+    // Вставляем точки в нужные позиции
+    if (newText.length >= 2) {
+      newText = newText.substring(0, 2) + '.' + newText.substring(2);
+    }
+    if (newText.length >= 5) {
+      newText = newText.substring(0, 5) + '.' + newText.substring(5);
+    }
+
+    // Ограничиваем длину строки до 10 символов (dd.MM.yyyy)
+    newText = newText.substring(0, newText.length > 10 ? 10 : newText.length);
+
+    return TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newText.length),
+    );
+  }
+}
+
 class TextForm extends StatefulWidget {
   final Function(User) onEmployeeAdded;
-  const TextForm({Key? key, required this.onEmployeeAdded});
+  const TextForm({Key? key, required this.onEmployeeAdded}) : super(key: key);
 
   @override
   State<TextForm> createState() => _TextFormState();
@@ -53,18 +79,18 @@ class _TextFormState extends State<TextForm> {
     if (!mounted) return;
 
     final newUser = User(
-      surname: _surname.text,
-      name: _name.text,
-      patronymic: _patronymic.text,
-      number: _number.text,
+      surname: _surname.text.isNotEmpty ? _surname.text : 'Фамилия',
+      name: _name.text.isNotEmpty ? _name.text : 'Имя',
+      patronymic: _patronymic.text.isNotEmpty ? _patronymic.text : 'Отчество',
+      number: _number.text.isNotEmpty ? _number.text : 'Номер телефона',
       imagePath: _image?.path,
-      medicalBook: _medicalBook.text,
-      deviceDate: _deviceDate.text,
+      medicalBook:
+          _medicalBook.text.isNotEmpty ? _medicalBook.text : 'Медкнижка',
+      deviceDate:
+          _deviceDate.text.isNotEmpty ? _deviceDate.text : 'Дата устройства',
     );
 
     widget.onEmployeeAdded(newUser);
-
-    await Future.delayed(const Duration(milliseconds: 500));
 
     if (mounted) {
       Navigator.of(context).pop(newUser);
@@ -89,7 +115,6 @@ class _TextFormState extends State<TextForm> {
               IconButton(
                 onPressed: () {
                   saveUser();
-                  Navigator.of(context).pop(newUser);
                 },
                 icon: const Icon(
                   Icons.save,
@@ -224,7 +249,7 @@ class _TextFormState extends State<TextForm> {
                 children: [
                   Expanded(
                     child: TextFormField(
-                      inputFormatters: [LengthLimitingTextInputFormatter(10)],
+                      inputFormatters: [DateInputFormatter()],
                       keyboardType: TextInputType.number,
                       controller: _deviceDate,
                       decoration: const InputDecoration(
@@ -245,7 +270,7 @@ class _TextFormState extends State<TextForm> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: TextFormField(
-                      inputFormatters: [LengthLimitingTextInputFormatter(10)],
+                      inputFormatters: [DateInputFormatter()],
                       keyboardType: TextInputType.number,
                       controller: _medicalBook,
                       decoration: const InputDecoration(

@@ -13,7 +13,7 @@ class DayIndicator extends StatelessWidget {
     try {
       startDate = DateFormat('dd.MM.yyyy').parse(startDateString);
     } catch (e) {
-      return const Text('Неверный формат даты');
+      return const Text('Неверный формат даты устройства');
     }
 
     return Container(
