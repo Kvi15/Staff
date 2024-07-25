@@ -2,37 +2,54 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_staff/home_page/user.dart';
-import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
+
+void showChangePersonListDialog(
+    BuildContext context, User user, VoidCallback onUpdate) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return ChangePersonList(user: user, onUpdate: onUpdate);
+    },
+  );
+}
 
 class ChangePersonList extends StatefulWidget {
   final User user;
+  final VoidCallback onUpdate;
 
-  const ChangePersonList({super.key, required this.user});
+  const ChangePersonList({
+    super.key,
+    required this.user,
+    required this.onUpdate,
+  });
 
   @override
-  State<ChangePersonList> createState() => _ChangePersonListState();
+  _ChangePersonListState createState() => _ChangePersonListState();
 }
 
 class _ChangePersonListState extends State<ChangePersonList> {
-  final TextEditingController _surnameController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _patronymicController = TextEditingController();
-  final TextEditingController _numberController = TextEditingController();
-  final TextEditingController _deviceDate = TextEditingController();
-  final TextEditingController _medicalBook = TextEditingController();
+  late TextEditingController _surnameController;
+  late TextEditingController _nameController;
+  late TextEditingController _patronymicController;
+  late TextEditingController _numberController;
+  late TextEditingController _deviceDateController;
+  late TextEditingController _medicalBookController;
   XFile? _image;
   final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    _surnameController.text = widget.user.surname;
-    _nameController.text = widget.user.name;
-    _patronymicController.text = widget.user.patronymic;
-    _numberController.text = widget.user.number;
-    _deviceDate.text = widget.user.deviceDate;
-    _medicalBook.text = widget.user.medicalBook;
+    _surnameController = TextEditingController(text: widget.user.surname);
+    _nameController = TextEditingController(text: widget.user.name);
+    _patronymicController = TextEditingController(text: widget.user.patronymic);
+    _numberController = TextEditingController(text: widget.user.number);
+    _deviceDateController = TextEditingController(text: widget.user.deviceDate);
+    _medicalBookController =
+        TextEditingController(text: widget.user.medicalBook);
+    _image =
+        widget.user.imagePath != null ? XFile(widget.user.imagePath!) : null;
   }
 
   @override
@@ -41,8 +58,8 @@ class _ChangePersonListState extends State<ChangePersonList> {
     _nameController.dispose();
     _patronymicController.dispose();
     _numberController.dispose();
-    _deviceDate.dispose();
-    _medicalBook.dispose();
+    _deviceDateController.dispose();
+    _medicalBookController.dispose();
     super.dispose();
   }
 
@@ -57,45 +74,44 @@ class _ChangePersonListState extends State<ChangePersonList> {
   }
 
   void updateUser() {
-    final updatedUser = User(
-      surname: _surnameController.text,
-      name: _nameController.text,
-      patronymic: _patronymicController.text,
-      number: _numberController.text,
-      deviceDate: _deviceDate.text,
-      medicalBook: _medicalBook.text,
-      imagePath: _image?.path,
-    );
+    setState(() {
+      widget.user.surname = _surnameController.text;
+      widget.user.name = _nameController.text;
+      widget.user.patronymic = _patronymicController.text;
+      widget.user.number = _numberController.text;
+      widget.user.deviceDate = _deviceDateController.text;
+      widget.user.medicalBook = _medicalBookController.text;
+      widget.user.imagePath = _image?.path;
+    });
 
-    // Проверка на null для ключа
-    final key = widget.user.key;
-    if (key != null) {
-      Hive.box<User>('users').put(key, updatedUser);
-    }
-
-    Navigator.of(context).pop();
+    widget.user.save().then((_) {
+      widget.onUpdate(); // Вызов обратного вызова для обновления списка
+      Navigator.of(context).pop();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final dialogWidth = width - 60; // 15 пикселей слева и 15 пикселей справа
+
     return AlertDialog(
-      contentPadding: const EdgeInsets.all(20),
-      content: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width - 40,
-          height: 600,
-          child: SingleChildScrollView(
+      title: const Text('Изменить данные'),
+      contentPadding: EdgeInsets.zero,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 30),
+      content: SizedBox(
+        width: dialogWidth,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
+              children: <Widget>[
                 GestureDetector(
                   onTap: _pickImage,
                   child: Container(
                     margin: const EdgeInsets.all(15.0),
                     width: 150,
-                    height: 170,
+                    height: 150,
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(15),
@@ -109,77 +125,53 @@ class _ChangePersonListState extends State<ChangePersonList> {
                             ),
                           )
                         : ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(15),
                             child: Image.file(
                               File(_image!.path),
                               fit: BoxFit.cover,
                               width: 150,
-                              height: 170,
+                              height: 150,
                             ),
                           ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                TextFormField(
+                TextField(
                   controller: _surnameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Фамилия',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Фамилия'),
                 ),
-                const SizedBox(height: 20),
-                TextFormField(
+                TextField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Имя',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Имя'),
                 ),
-                const SizedBox(height: 20),
-                TextFormField(
+                TextField(
                   controller: _patronymicController,
-                  decoration: const InputDecoration(
-                    labelText: 'Отчество',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Отчество'),
                 ),
-                const SizedBox(height: 20),
-                TextFormField(
+                TextField(
                   controller: _numberController,
-                  decoration: const InputDecoration(
-                    labelText: 'Номер телефона',
-                  ),
+                  decoration:
+                      const InputDecoration(labelText: 'Номер телефона'),
                 ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: _deviceDate,
-                  decoration: const InputDecoration(
-                    labelText: 'Дата устройства',
-                  ),
+                TextField(
+                  controller: _deviceDateController,
+                  decoration:
+                      const InputDecoration(labelText: 'Дата устройства'),
                 ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: _medicalBook,
-                  decoration: const InputDecoration(
-                    labelText: 'Медкнижка',
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: updateUser,
-                  child: const Text('Сохранить изменения'),
+                TextField(
+                  controller: _medicalBookController,
+                  decoration: const InputDecoration(labelText: 'Медкнижка'),
                 ),
               ],
             ),
           ),
         ),
       ),
+      actions: <Widget>[
+        ElevatedButton(
+          onPressed: updateUser,
+          child: const Text('Сохранить изменения'),
+        ),
+      ],
     );
   }
-}
-
-void showChangePersonListDialog(BuildContext context, User user) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return ChangePersonList(user: user);
-    },
-  );
 }

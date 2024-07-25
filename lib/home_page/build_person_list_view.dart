@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_staff/home_page/change_person_list.dart';
 import 'package:flutter_staff/home_page/day_Indicator.dart';
@@ -28,12 +29,22 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
     userBox = Hive.box<User>('users');
   }
 
-  void _deleteUser(User user) {
-    userBox.delete(user.key);
+  void _deleteUser(User user) async {
+    await userBox.delete(user.key);
+    setState(() {
+      widget.users.remove(user);
+    });
   }
 
   void _editUser(User user) {
-    showChangePersonListDialog(context, user);
+    showChangePersonListDialog(context, user, _refreshUsers);
+  }
+
+  void _refreshUsers() {
+    setState(() {
+      widget.users.sort((a, b) => a.surname.compareTo(
+          b.surname)); // сортировка или любое другое обновление списка
+    });
   }
 
   @override
