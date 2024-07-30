@@ -33,6 +33,7 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
     await userBox.delete(user.key);
     setState(() {
       widget.users.remove(user);
+      _refreshUsers();
     });
   }
 
@@ -42,8 +43,7 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
 
   void _refreshUsers() {
     setState(() {
-      widget.users.sort((a, b) => a.surname.compareTo(
-          b.surname)); // сортировка или любое другое обновление списка
+      widget.users.sort((a, b) => a.surname.compareTo(b.surname));
     });
   }
 
@@ -55,6 +55,10 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
       delegate: SliverChildBuilderDelegate(
         (context, index) {
           final user = widget.users[index];
+          final imagePath = user.imagePath?.isNotEmpty == true
+              ? user.imagePath!
+              : 'assets/icons/lgv9s1kz-removebg-preview.png';
+
           return Center(
             child: Container(
               height: 200,
@@ -91,17 +95,17 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
                             SizedBox(
                               height: 130,
                               width: 130,
-                              child: user.imagePath != null
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(20),
-                                      child: Image.file(
-                                        File(user.imagePath!),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                                  : Image.asset(
-                                      'assets/icons/lgv9s1kz-removebg-preview.png',
-                                    ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: imagePath.startsWith('assets/')
+                                    ? Image.asset(imagePath, fit: BoxFit.cover)
+                                    : Image.file(File(imagePath),
+                                        fit: BoxFit.cover, errorBuilder:
+                                            (context, error, stackTrace) {
+                                        return Image.asset(
+                                            'assets/icons/lgv9s1kz-removebg-preview.png');
+                                      }),
+                              ),
                             ),
                             const SizedBox(width: 10),
                             Column(
