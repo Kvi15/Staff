@@ -49,18 +49,7 @@ class _NotificationPushState extends State<NotificationPush> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Flutter Local Notifications'),
-        ),
-        body: Center(
-          child: ElevatedButton(
-            onPressed: _showNotification,
-            child: const Text('Показать уведомление'),
-          ),
-        ),
-      ),
-    );
+    // TODO: implement build
+    throw UnimplementedError();
   }
 }
