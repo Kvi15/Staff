@@ -5,7 +5,9 @@ import 'package:flutter_staff/home_page/user.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class AddingAPerson extends StatefulWidget {
-  const AddingAPerson({super.key});
+  final Box<User> userBox;
+
+  const AddingAPerson({super.key, required this.userBox});
 
   @override
   State<AddingAPerson> createState() => _AddingAPersonState();
@@ -21,7 +23,7 @@ class _AddingAPersonState extends State<AddingAPerson> {
   @override
   void initState() {
     super.initState();
-    userBox = Hive.box<User>('users');
+    userBox = widget.userBox; // Используем переданный userBox
     _searchController.addListener(_updateSearchState);
     _searchFocusNode.addListener(_handleFocusChange);
     _filteredUsers = userBox.values.toList();

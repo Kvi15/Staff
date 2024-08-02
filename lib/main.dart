@@ -12,17 +12,19 @@ void main() async {
   // Открываем коробку (Box) пользователей
   var userBox = await Hive.openBox<User>('users');
 
-  // Запускаем приложение
-  runApp(const MyApp());
+  // Запускаем приложение и передаем userBox в MyApp
+  runApp(MyApp(userBox: userBox));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Box<User> userBox;
+
+  const MyApp({super.key, required this.userBox});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: AddingAPerson(),
+    return MaterialApp(
+      home: AddingAPerson(userBox: userBox),
     );
   }
 }
