@@ -32,7 +32,7 @@ class DateInputFormatter extends TextInputFormatter {
 
 class TextForm extends StatefulWidget {
   final Function(User) onEmployeeAdded;
-  const TextForm({Key? key, required this.onEmployeeAdded}) : super(key: key);
+  const TextForm({super.key, required this.onEmployeeAdded});
 
   @override
   State<TextForm> createState() => _TextFormState();

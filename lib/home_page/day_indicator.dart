@@ -33,10 +33,16 @@ class DayIndicator extends StatelessWidget {
     int daysPassed = DateTime.now().difference(startDate).inDays;
 
     // Проверка на количество дней
-    if (daysPassed == 14) {
-      _notificationService.showDay14Notification(); // Вызов функции уведомления
+    if (daysPassed == 12) {
+      _notificationService.showDay12Notification(); // Вызов функции уведомления
+    } else if (daysPassed == 14) {
+      _notificationService.showDay14Notification();
+    } else if (daysPassed == 28) {
+      _notificationService.showDay28Notification();
     } else if (daysPassed == 30) {
       _notificationService.showDay30Notification();
+    } else if (daysPassed == 58) {
+      _notificationService.showDay58Notification();
     } else if (daysPassed == 60) {
       _notificationService.showDay60Notification();
     }
