@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_staff/home_page/notification_service.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
 
 class DayIndicator extends StatelessWidget {
   final String startDateString;
-  final NotificationService _notificationService =
-      NotificationService(); // Создайте экземпляр сервиса
 
-  DayIndicator({super.key, required this.startDateString});
+  const DayIndicator({super.key, required this.startDateString});
 
   @override
   Widget build(BuildContext context) {
@@ -32,24 +29,8 @@ class DayIndicator extends StatelessWidget {
   Widget _buildDayIndicator(BuildContext context, DateTime startDate) {
     int daysPassed = DateTime.now().difference(startDate).inDays;
 
-    // Проверка на количество дней
-    if (daysPassed == 12) {
-      _notificationService.showDay12Notification(); // Вызов функции уведомления
-    } else if (daysPassed == 14) {
-      _notificationService.showDay14Notification();
-    } else if (daysPassed == 28) {
-      _notificationService.showDay28Notification();
-    } else if (daysPassed == 30) {
-      _notificationService.showDay30Notification();
-    } else if (daysPassed == 58) {
-      _notificationService.showDay58Notification();
-    } else if (daysPassed == 60) {
-      _notificationService.showDay60Notification();
-    }
-
-    // Если прошло больше 60 дней, уведомления не отправляются
+    // Если прошло больше 60 дней, мы отображаем индикатор с пометкой превышения
     if (daysPassed > 60) {
-      // Если нужно, можно добавить код для предотвращения отправки уведомлений
       return CustomPaint(
         size: const Size(double.infinity, 50),
         painter: DayIndicatorPainter(daysPassed: daysPassed, exceeded: true),

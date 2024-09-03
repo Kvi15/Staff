@@ -1,154 +1,92 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_staff/home_page/user.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter/foundation.dart';
 
 class NotificationService {
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-  final User _user = User();
+  static final NotificationService _instance = NotificationService._internal();
 
-  NotificationService() {
-    _initializeNotifications();
+  factory NotificationService() {
+    return _instance;
   }
 
-  void _initializeNotifications() {
+  NotificationService._internal();
+
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  Future<void> init() async {
+    // Инициализация Timezone
+    tz.initializeTimeZones();
+    final String currentTimeZone = DateTime.now().timeZoneName;
+    tz.setLocalLocation(tz.getLocation(currentTimeZone));
+
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
+      requestSoundPermission: false,
+      requestBadgePermission: false,
+      requestAlertPermission: false,
+    );
+
     const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-
-    _flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  }
-
-  Future<void> showDay12Notification() async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'day_12_channel_id',
-      'Day 12 Notification',
-      channelDescription: 'Notification when the 12th day is reached',
-      importance: Importance.max,
-      priority: Priority.high,
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
     );
 
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await _flutterLocalNotificationsPlugin.show(
-      0,
-      'RoStaff',
-      'Приблежается день ТЕТ-А-ТЕТ с ${_user.name} ${_user.surname} ',
-      platformChannelSpecifics,
-      payload: 'day_12',
+    await _notificationsPlugin.initialize(
+      initializationSettings,
     );
   }
 
-  Future<void> showDay14Notification() async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'day_14_channel_id',
-      'Day 14 Notification',
-      channelDescription: 'Notification when the 14th day is reached',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await _flutterLocalNotificationsPlugin.show(
+  Future<void> scheduleDailyNotification(
+      DateTime selectedDate, User user) async {
+    final DateTime scheduledDateTime = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      8,
       0,
-      'RoStaff',
-      'Сегодня день ТЕТ-А-ТЕТ с 14 ',
-      platformChannelSpecifics,
-      payload: 'day_14',
     );
+
+    final tz.TZDateTime scheduledTime =
+        tz.TZDateTime.from(scheduledDateTime, tz.local);
+
+    try {
+      await _notificationsPlugin.zonedSchedule(
+        0,
+        "RoStaff",
+        "Приближается день ТЕТ-А-ТЕТ с ${user.surname} ${user.name} ${user.patronymic}",
+        scheduledTime,
+        _notificationDetails(),
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+
+      debugPrint('Notification scheduled successfully for $scheduledTime');
+    } catch (e) {
+      debugPrint('Error scheduling notifications: $e');
+    }
   }
 
-  Future<void> showDay28Notification() async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'day_28_channel_id',
-      'Day 28 Notification',
-      channelDescription: 'Notification when the 28th day is reached',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await _flutterLocalNotificationsPlugin.show(
-      0,
-      'RoStaff',
-      'Приблежается день ТЕТ-А-ТЕТ с 28 ',
-      platformChannelSpecifics,
-      payload: 'day_28',
-    );
-  }
-
-  Future<void> showDay30Notification() async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'day_30_channel_id',
-      'Day 30 Notification',
-      channelDescription: 'Notification when the 30th day is reached',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await _flutterLocalNotificationsPlugin.show(
-      0,
-      'RoStaff',
-      'Сегодня день ТЕТ-А-ТЕТ с 30 ',
-      platformChannelSpecifics,
-      payload: 'day_30',
-    );
-  }
-
-  Future<void> showDay58Notification() async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'day_58_channel_id',
-      'Day 58 Notification',
-      channelDescription: 'Notification when the 58th day is reached',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await _flutterLocalNotificationsPlugin.show(
-      0,
-      'RoStaff',
-      'Приблежается день ТЕТ-А-ТЕТ с 58 ',
-      platformChannelSpecifics,
-      payload: 'day_58',
-    );
-  }
-
-  Future<void> showDay60Notification() async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'day_60_channel_id',
-      'Day 60 Notification',
-      channelDescription: 'Notification when the 60th day is reached',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await _flutterLocalNotificationsPlugin.show(
-      0,
-      'RoStaff',
-      'Сегодня день ТЕТ-А-ТЕТ с 60',
-      platformChannelSpecifics,
-      payload: 'day_60',
+  NotificationDetails _notificationDetails() {
+    return const NotificationDetails(
+      android: AndroidNotificationDetails(
+        'your_channel_id',
+        'your_channel_name',
+        channelDescription: 'your_channel_description',
+        importance: Importance.max,
+        priority: Priority.high,
+        showWhen: false,
+      ),
+      iOS: DarwinNotificationDetails(),
     );
   }
 }

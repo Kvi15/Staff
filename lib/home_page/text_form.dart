@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staff/home_page/user.dart';
+import 'package:flutter_staff/home_page/notification_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:intl/intl.dart'; // Для работы с датами
 
-// Форматтер для ввода даты в формате dd.MM.yyyy
 class DateInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
-    // Убираем все символы, кроме цифр
     String newText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
 
-    // Вставляем точки в нужные позиции
     if (newText.length >= 2) {
       newText = newText.substring(0, 2) + '.' + newText.substring(2);
     }
@@ -20,7 +19,6 @@ class DateInputFormatter extends TextInputFormatter {
       newText = newText.substring(0, 5) + '.' + newText.substring(5);
     }
 
-    // Ограничиваем длину строки до 10 символов (dd.MM.yyyy)
     newText = newText.substring(0, newText.length > 10 ? 10 : newText.length);
 
     return TextEditingValue(
@@ -49,10 +47,7 @@ class _TextFormState extends State<TextForm> {
   XFile? _image;
   final ImagePicker _picker = ImagePicker();
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  final NotificationService _notificationService = NotificationService();
 
   @override
   void dispose() {
@@ -89,6 +84,30 @@ class _TextFormState extends State<TextForm> {
       deviceDate:
           _deviceDate.text.isNotEmpty ? _deviceDate.text : 'Дата устройства',
     );
+
+    // Планирование уведомлений
+    if (_deviceDate.text.isNotEmpty) {
+      try {
+        final dateFormat = DateFormat('dd.MM.yyyy');
+        DateTime startDate = dateFormat.parse(_deviceDate.text);
+
+        // Планирование уведомлений с использованием ФИО
+        await _notificationService.scheduleDailyNotification(
+            startDate.add(Duration(days: 12)), newUser);
+        await _notificationService.scheduleDailyNotification(
+            startDate.add(Duration(days: 14)), newUser);
+        await _notificationService.scheduleDailyNotification(
+            startDate.add(Duration(days: 28)), newUser);
+        await _notificationService.scheduleDailyNotification(
+            startDate.add(Duration(days: 30)), newUser);
+        await _notificationService.scheduleDailyNotification(
+            startDate.add(Duration(days: 58)), newUser);
+        await _notificationService.scheduleDailyNotification(
+            startDate.add(Duration(days: 60)), newUser);
+      } catch (e) {
+        debugPrint('Error scheduling notifications: $e');
+      }
+    }
 
     widget.onEmployeeAdded(newUser);
 
