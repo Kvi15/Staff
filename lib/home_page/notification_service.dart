@@ -1,6 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_staff/home_page/user.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/foundation.dart';
@@ -59,7 +58,7 @@ class NotificationService {
 
     try {
       await _notificationsPlugin.zonedSchedule(
-        0,
+        user.key as int, // Используем user.key как уникальный идентификатор
         "RoStaff",
         "Приближается день ТЕТ-А-ТЕТ с ${user.surname} ${user.name} ${user.patronymic}",
         scheduledTime,
@@ -88,5 +87,9 @@ class NotificationService {
       ),
       iOS: DarwinNotificationDetails(),
     );
+  }
+
+  Future<void> cancelNotification(int id) async {
+    await _notificationsPlugin.cancel(id);
   }
 }

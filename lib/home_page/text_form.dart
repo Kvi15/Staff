@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staff/home_page/user.dart';
 import 'package:flutter_staff/home_page/notification_service.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:intl/intl.dart'; // Для работы с датами
@@ -85,13 +86,17 @@ class _TextFormState extends State<TextForm> {
           _deviceDate.text.isNotEmpty ? _deviceDate.text : 'Дата устройства',
     );
 
+    // Сохраняем пользователя в базу данных
+    final box = Hive.box<User>('users');
+    await box.add(newUser); // После этого newUser.key будет доступен
+
     // Планирование уведомлений
     if (_deviceDate.text.isNotEmpty) {
       try {
         final dateFormat = DateFormat('dd.MM.yyyy');
         DateTime startDate = dateFormat.parse(_deviceDate.text);
 
-        // Планирование уведомлений с использованием ФИО
+        // Используем ключ пользователя как уникальный идентификатор уведомлений
         await _notificationService.scheduleDailyNotification(
             startDate.add(Duration(days: 12)), newUser);
         await _notificationService.scheduleDailyNotification(

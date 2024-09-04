@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_staff/home_page/change_person_list.dart';
 import 'package:flutter_staff/home_page/day_Indicator.dart';
+import 'package:flutter_staff/home_page/notification_service.dart';
 import 'package:flutter_staff/home_page/user.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -30,7 +31,12 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
   }
 
   void _deleteUser(User user) async {
-    await userBox.delete(user.key);
+    // Отменяем уведомления перед удалением пользователя
+    final notificationService = NotificationService();
+    await notificationService
+        .cancelNotification(user.key); // отмени уведомление
+
+    await userBox.delete(user.key); // удаляем пользователя
     setState(() {
       widget.users.remove(user);
       _refreshUsers();

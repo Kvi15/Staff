@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staff/home_page/build_person_list_view.dart';
+import 'package:flutter_staff/home_page/notification_service.dart';
 import 'package:flutter_staff/home_page/text_form.dart';
 import 'package:flutter_staff/home_page/user.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
 
 class AddingAPerson extends StatefulWidget {
   final Box<User> userBox;
@@ -31,9 +33,43 @@ class _AddingAPersonState extends State<AddingAPerson> {
 
   void _addUser(User user) {
     setState(() {
-      userBox.add(user);
+      if (user.isInBox) {
+        // Если пользователь уже сохранен, просто обновляем его данные
+        user.save();
+      } else {
+        // Если пользователь новый, добавляем его в коробку
+        userBox.add(user);
+
+        // Планирование уведомлений только для нового пользователя
+        _scheduleNotificationsForUser(user);
+      }
       _filteredUsers = userBox.values.toList();
     });
+  }
+
+  void _scheduleNotificationsForUser(User user) {
+    final NotificationService _notificationService = NotificationService();
+    final dateFormat = DateFormat('dd.MM.yyyy');
+
+    if (user.deviceDate.isNotEmpty) {
+      try {
+        DateTime startDate = dateFormat.parse(user.deviceDate);
+        _notificationService.scheduleDailyNotification(
+            startDate.add(Duration(days: 12)), user);
+        _notificationService.scheduleDailyNotification(
+            startDate.add(Duration(days: 14)), user);
+        _notificationService.scheduleDailyNotification(
+            startDate.add(Duration(days: 28)), user);
+        _notificationService.scheduleDailyNotification(
+            startDate.add(Duration(days: 30)), user);
+        _notificationService.scheduleDailyNotification(
+            startDate.add(Duration(days: 58)), user);
+        _notificationService.scheduleDailyNotification(
+            startDate.add(Duration(days: 60)), user);
+      } catch (e) {
+        debugPrint('Error scheduling notifications: $e');
+      }
+    }
   }
 
   void _toggleSearch() {
