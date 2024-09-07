@@ -48,24 +48,24 @@ class _AddingAPersonState extends State<AddingAPerson> {
   }
 
   void _scheduleNotificationsForUser(User user) {
-    final NotificationService _notificationService = NotificationService();
+    final NotificationService notificationService = NotificationService();
     final dateFormat = DateFormat('dd.MM.yyyy');
 
     if (user.deviceDate.isNotEmpty) {
       try {
         DateTime startDate = dateFormat.parse(user.deviceDate);
-        _notificationService.scheduleDailyNotification(
-            startDate.add(Duration(days: 12)), user);
-        _notificationService.scheduleDailyNotification(
-            startDate.add(Duration(days: 14)), user);
-        _notificationService.scheduleDailyNotification(
-            startDate.add(Duration(days: 28)), user);
-        _notificationService.scheduleDailyNotification(
-            startDate.add(Duration(days: 30)), user);
-        _notificationService.scheduleDailyNotification(
-            startDate.add(Duration(days: 58)), user);
-        _notificationService.scheduleDailyNotification(
-            startDate.add(Duration(days: 60)), user);
+        notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 12)), user);
+        notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 14)), user);
+        notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 28)), user);
+        notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 30)), user);
+        notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 58)), user);
+        notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 60)), user);
       } catch (e) {
         debugPrint('Error scheduling notifications: $e');
       }

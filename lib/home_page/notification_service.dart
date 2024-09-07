@@ -19,8 +19,9 @@ class NotificationService {
   Future<void> init() async {
     // Инициализация Timezone
     tz.initializeTimeZones();
-    final String currentTimeZone = DateTime.now().timeZoneName;
-    tz.setLocalLocation(tz.getLocation(currentTimeZone));
+
+    // Вместо явного указания имени временной зоны, используйте локальную зону
+    tz.setLocalLocation(tz.local);
 
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -40,6 +41,20 @@ class NotificationService {
 
     await _notificationsPlugin.initialize(
       initializationSettings,
+    );
+  }
+
+  NotificationDetails _notificationDetails() {
+    return const NotificationDetails(
+      android: AndroidNotificationDetails(
+        'your_channel_id',
+        'your_channel_name',
+        channelDescription: 'your_channel_description',
+        importance: Importance.max,
+        priority: Priority.high,
+        showWhen: false,
+      ),
+      iOS: DarwinNotificationDetails(),
     );
   }
 
@@ -73,20 +88,6 @@ class NotificationService {
     } catch (e) {
       debugPrint('Error scheduling notifications: $e');
     }
-  }
-
-  NotificationDetails _notificationDetails() {
-    return const NotificationDetails(
-      android: AndroidNotificationDetails(
-        'your_channel_id',
-        'your_channel_name',
-        channelDescription: 'your_channel_description',
-        importance: Importance.max,
-        priority: Priority.high,
-        showWhen: false,
-      ),
-      iOS: DarwinNotificationDetails(),
-    );
   }
 
   Future<void> cancelNotification(int id) async {
