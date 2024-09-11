@@ -60,16 +60,17 @@ class NotificationService {
 
   Future<void> scheduleDailyNotification(
       DateTime selectedDate, User user) async {
-    final DateTime scheduledDateTime = DateTime(
+    // Используем локальное время, чтобы избежать сдвига на UTC
+    final tz.TZDateTime scheduledTime = tz.TZDateTime.local(
       selectedDate.year,
       selectedDate.month,
       selectedDate.day,
-      8,
-      0,
+      8, // Час, когда должно быть запланировано уведомление (8:00 утра)
+      0, // Минута
     );
 
-    final tz.TZDateTime scheduledTime =
-        tz.TZDateTime.from(scheduledDateTime, tz.local);
+    // Выводим временную зону для отладки
+    debugPrint('Local timezone: ${tz.local}');
 
     try {
       await _notificationsPlugin.zonedSchedule(
