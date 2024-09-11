@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_staff/home_page/formatter_date.dart';
 import 'package:flutter_staff/home_page/user.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -156,11 +157,13 @@ class _ChangePersonListState extends State<ChangePersonList> {
                       const InputDecoration(labelText: 'Номер телефона'),
                 ),
                 TextField(
+                  inputFormatters: [FormatterDate()],
                   controller: _deviceDateController,
                   decoration:
                       const InputDecoration(labelText: 'Дата устройства'),
                 ),
                 TextField(
+                  inputFormatters: [FormatterDate()],
                   controller: _medicalBookController,
                   decoration: const InputDecoration(labelText: 'Медкнижка'),
                 ),

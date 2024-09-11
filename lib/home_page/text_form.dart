@@ -1,33 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_staff/home_page/formatter_date.dart';
 import 'package:flutter_staff/home_page/user.dart';
 import 'package:flutter_staff/home_page/notification_service.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:intl/intl.dart'; // Для работы с датами
-
-class DateInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    String newText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
-
-    if (newText.length >= 2) {
-      newText = newText.substring(0, 2) + '.' + newText.substring(2);
-    }
-    if (newText.length >= 5) {
-      newText = newText.substring(0, 5) + '.' + newText.substring(5);
-    }
-
-    newText = newText.substring(0, newText.length > 10 ? 10 : newText.length);
-
-    return TextEditingValue(
-      text: newText,
-      selection: TextSelection.collapsed(offset: newText.length),
-    );
-  }
-}
 
 class TextForm extends StatefulWidget {
   final Function(User) onEmployeeAdded;
@@ -98,17 +77,17 @@ class _TextFormState extends State<TextForm> {
 
         // Используем ключ пользователя как уникальный идентификатор уведомлений
         await _notificationService.scheduleDailyNotification(
-            startDate.add(Duration(days: 12)), newUser);
+            startDate.add(const Duration(days: 12)), newUser);
         await _notificationService.scheduleDailyNotification(
-            startDate.add(Duration(days: 14)), newUser);
+            startDate.add(const Duration(days: 14)), newUser);
         await _notificationService.scheduleDailyNotification(
-            startDate.add(Duration(days: 28)), newUser);
+            startDate.add(const Duration(days: 28)), newUser);
         await _notificationService.scheduleDailyNotification(
-            startDate.add(Duration(days: 30)), newUser);
+            startDate.add(const Duration(days: 30)), newUser);
         await _notificationService.scheduleDailyNotification(
-            startDate.add(Duration(days: 58)), newUser);
+            startDate.add(const Duration(days: 58)), newUser);
         await _notificationService.scheduleDailyNotification(
-            startDate.add(Duration(days: 60)), newUser);
+            startDate.add(const Duration(days: 60)), newUser);
       } catch (e) {
         debugPrint('Error scheduling notifications: $e');
       }
@@ -273,7 +252,7 @@ class _TextFormState extends State<TextForm> {
                 children: [
                   Expanded(
                     child: TextFormField(
-                      inputFormatters: [DateInputFormatter()],
+                      inputFormatters: [FormatterDate()],
                       keyboardType: TextInputType.number,
                       controller: _deviceDate,
                       decoration: const InputDecoration(
@@ -294,7 +273,7 @@ class _TextFormState extends State<TextForm> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: TextFormField(
-                      inputFormatters: [DateInputFormatter()],
+                      inputFormatters: [FormatterDate()],
                       keyboardType: TextInputType.number,
                       controller: _medicalBook,
                       decoration: const InputDecoration(
