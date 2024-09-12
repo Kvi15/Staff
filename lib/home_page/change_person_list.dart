@@ -1,9 +1,10 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_staff/home_page/formatter_date.dart';
+import 'package:flutter_staff/home_page/notification_service.dart';
 import 'package:flutter_staff/home_page/user.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 void showChangePersonListDialog(
     BuildContext context, User user, VoidCallback onUpdate) {
@@ -53,6 +54,41 @@ class _ChangePersonListState extends State<ChangePersonList> {
         widget.user.imagePath != null ? XFile(widget.user.imagePath!) : null;
   }
 
+  void _rescheduleNotification(User user) async {
+    final notificationService = NotificationService();
+
+    // Отменяем старые уведомления
+    await notificationService.cancelNotification(user.key);
+
+    // Планируем новые уведомления
+    _scheduleNotificationsForUser(user);
+  }
+
+  void _scheduleNotificationsForUser(User user) {
+    final NotificationService notificationService = NotificationService();
+    final dateFormat = DateFormat('dd.MM.yyyy');
+
+    if (user.deviceDate.isNotEmpty) {
+      try {
+        DateTime startDate = dateFormat.parse(user.deviceDate);
+        notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 12)), user);
+        notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 14)), user);
+        notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 28)), user);
+        notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 30)), user);
+        notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 58)), user);
+        notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 60)), user);
+      } catch (e) {
+        debugPrint('Error scheduling notifications: $e');
+      }
+    }
+  }
+
   @override
   void dispose() {
     _surnameController.dispose();
@@ -86,6 +122,7 @@ class _ChangePersonListState extends State<ChangePersonList> {
     });
 
     widget.user.save().then((_) {
+      _rescheduleNotification(widget.user); // Перепланируем уведомления
       widget.onUpdate(); // Вызов обратного вызова для обновления списка
       Navigator.of(context).pop();
     });
