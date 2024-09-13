@@ -134,113 +134,169 @@ class _AddingAPersonState extends State<AddingAPerson> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color.fromARGB(255, 255, 0, 0),
-                  Color.fromARGB(115, 255, 255, 255),
-                ],
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
+    return GestureDetector(
+      onTap: () {
+        // Снимаем фокус с полей ввода и закрываем клавиатуру
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color.fromARGB(255, 255, 0, 0),
+                    Color.fromARGB(115, 255, 255, 255),
+                  ],
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                ),
               ),
-            ),
-            child: Center(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 60),
-                    child: SizedBox(
-                      height: 200,
-                      width: 200,
-                      child: Image.asset(
-                        'assets/icons/lgv9s1kz-removebg-preview.png',
+              child: Center(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 60),
+                      child: SizedBox(
+                        height: 200,
+                        width: 200,
+                        child: Image.asset(
+                          'assets/icons/lgv9s1kz-removebg-preview.png',
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 300,
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                flexibleSpace: FlexibleSpaceBar(
-                  centerTitle: true,
-                  title: Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 260, 10, 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _isSearching
-                            ? Expanded(
-                                child: TextField(
-                                  textCapitalization: TextCapitalization.words,
-                                  controller: _searchController,
-                                  focusNode: _searchFocusNode,
-                                  decoration: InputDecoration(
-                                      hintText: 'Поиск',
-                                      suffixIcon: IconButton(
+            CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  expandedHeight: 300,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  flexibleSpace: FlexibleSpaceBar(
+                      centerTitle: true,
+                      title: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              if (_isSearching)
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        10, 260, 10, 10),
+                                    child: TextField(
+                                      textCapitalization:
+                                          TextCapitalization.words,
+                                      controller: _searchController,
+                                      focusNode: _searchFocusNode,
+                                      decoration: InputDecoration(
+                                        hintText: 'Поиск',
+                                        suffixIcon: IconButton(
                                           onPressed: _searchController.clear,
                                           icon: const Icon(
                                             Icons.clear,
                                             color: Colors.red,
                                             size: 20,
-                                          ))),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              else
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                      10, 260, 10, 10),
+                                  child: IconButton(
+                                    onPressed: _toggleSearch,
+                                    icon: const Icon(
+                                      Icons.search,
+                                      size: 25,
+                                    ),
+                                  ),
                                 ),
-                              )
-                            : IconButton(
-                                onPressed: _toggleSearch,
-                                icon: const Icon(
-                                  Icons.search,
-                                  size: 25,
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                child: IconButton(
+                                  icon: const Icon(
+                                    Icons.info_outline,
+                                    size: 20,
+                                  ),
+                                  color: Colors.black,
+                                  iconSize: 30,
+                                  onPressed: () {
+                                    // Действие при нажатии на иконку
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text(
+                                              'Связь с разработчиком'),
+                                          content: const Text(
+                                              'При обнаружении проблем в приложении прошу обращаться по адресу putslizox@gmail.com '),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: const Text('Закрыть'),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
                                 ),
                               ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      )),
+                ),
+                BuildPersonListView(
+                  scrollOffset: 0.0,
+                  users: _filteredUsers,
+                ),
+              ],
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: const Color.fromARGB(255, 255, 17, 0),
+          onPressed: () {
+            showModalBottomSheet<User>(
+              isScrollControlled: true,
+              context: context,
+              builder: (BuildContext context) {
+                return ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(25),
+                    topRight: Radius.circular(25),
+                  ),
+                  child: FractionallySizedBox(
+                    heightFactor: 0.53,
+                    child: TextForm(
+                      onEmployeeAdded: _addUser,
                     ),
                   ),
-                ),
-              ),
-              BuildPersonListView(
-                scrollOffset: 0.0,
-                users: _filteredUsers,
-              ),
-            ],
+                );
+              },
+            );
+          },
+          child: const Icon(
+            Icons.person_add,
+            color: Color.fromARGB(255, 255, 255, 255),
+            size: 40,
           ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color.fromARGB(255, 255, 17, 0),
-        onPressed: () {
-          showModalBottomSheet<User>(
-            isScrollControlled: true,
-            context: context,
-            builder: (BuildContext context) {
-              return ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(25),
-                  topRight: Radius.circular(25),
-                ),
-                child: FractionallySizedBox(
-                  heightFactor: 0.53,
-                  child: TextForm(
-                    onEmployeeAdded: _addUser,
-                  ),
-                ),
-              );
-            },
-          );
-        },
-        child: const Icon(
-          Icons.person_add,
-          color: Color.fromARGB(255, 255, 255, 255),
-          size: 40,
         ),
       ),
     );
