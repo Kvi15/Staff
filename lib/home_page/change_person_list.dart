@@ -72,17 +72,29 @@ class _ChangePersonListState extends State<ChangePersonList> {
       try {
         DateTime startDate = dateFormat.parse(user.deviceDate);
         notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 12)), user);
+            startDate.add(const Duration(days: 12)),
+            user,
+            "Через 2 дня ТЕТ-А-ТЕТ c ${user.surname} ${user.name} ${user.patronymic}");
         notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 14)), user);
+            startDate.add(const Duration(days: 14)),
+            user,
+            "Сегодня день ТЕТ-А-ТЕТ c ${user.surname} ${user.name} ${user.patronymic}");
         notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 28)), user);
+            startDate.add(const Duration(days: 28)),
+            user,
+            "Через 2 дня ТЕТ-А-ТЕТ c ${user.surname} ${user.name} ${user.patronymic}");
         notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 30)), user);
+            startDate.add(const Duration(days: 30)),
+            user,
+            "Сегодня день ТЕТ-А-ТЕТ c ${user.surname} ${user.name} ${user.patronymic}");
         notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 58)), user);
+            startDate.add(const Duration(days: 58)),
+            user,
+            "Через 2 дня ТЕТ-А-ТЕТ c ${user.surname} ${user.name} ${user.patronymic}");
         notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 60)), user);
+            startDate.add(const Duration(days: 60)),
+            user,
+            "Сегодня день ТЕТ-А-ТЕТ c ${user.surname} ${user.name} ${user.patronymic}");
       } catch (e) {
         debugPrint('Error scheduling notifications: $e');
       }

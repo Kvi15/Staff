@@ -59,24 +59,21 @@ class NotificationService {
   }
 
   Future<void> scheduleDailyNotification(
-      DateTime selectedDate, User user) async {
+      DateTime selectedDate, User user, String message) async {
     // Используем локальное время, чтобы избежать сдвига на UTC
     final tz.TZDateTime scheduledTime = tz.TZDateTime.local(
       selectedDate.year,
       selectedDate.month,
       selectedDate.day,
-      8, // Час, когда должно быть запланировано уведомление (8:00 утра)
+      8, // Час уведомления (например, 8 утра)
       0, // Минута
     );
-
-    // Выводим временную зону для отладки
-    debugPrint('Local timezone: ${tz.local}');
 
     try {
       await _notificationsPlugin.zonedSchedule(
         user.key as int, // Используем user.key как уникальный идентификатор
-        "RoStaff",
-        "Приближается день ТЕТ-А-ТЕТ с ${user.surname} ${user.name} ${user.patronymic}",
+        "RoSTaf", // Заголовок уведомления
+        message, // Текст уведомления
         scheduledTime,
         _notificationDetails(),
         androidAllowWhileIdle: true,
@@ -84,8 +81,6 @@ class NotificationService {
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time,
       );
-
-      debugPrint('Notification scheduled successfully for $scheduledTime');
     } catch (e) {
       debugPrint('Error scheduling notifications: $e');
     }

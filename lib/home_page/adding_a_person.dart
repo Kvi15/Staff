@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_staff/home_page/build_person_list_view.dart';
 import 'package:flutter_staff/home_page/notification_service.dart';
 import 'package:flutter_staff/home_page/text_form.dart';
@@ -54,18 +55,33 @@ class _AddingAPersonState extends State<AddingAPerson> {
     if (user.deviceDate.isNotEmpty) {
       try {
         DateTime startDate = dateFormat.parse(user.deviceDate);
+
+        String fullName = "${user.surname} ${user.name} ${user.patronymic}";
+
         notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 12)), user);
+            startDate.add(const Duration(days: 12)),
+            user,
+            "Через 2 дня ТЕТ-А-ТЕТ c $fullName");
         notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 14)), user);
+            startDate.add(const Duration(days: 14)),
+            user,
+            "Сегодня день ТЕТ-А-ТЕТ c $fullName");
         notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 28)), user);
+            startDate.add(const Duration(days: 28)),
+            user,
+            "Через 2 дня ТЕТ-А-ТЕТ c $fullName");
         notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 30)), user);
+            startDate.add(const Duration(days: 30)),
+            user,
+            "Сегодня день ТЕТ-А-ТЕТ c $fullName");
         notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 58)), user);
+            startDate.add(const Duration(days: 58)),
+            user,
+            "Через 2 дня ТЕТ-А-ТЕТ c $fullName");
         notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 60)), user);
+            startDate.add(const Duration(days: 60)),
+            user,
+            "Сегодня день ТЕТ-А-ТЕТ c $fullName");
       } catch (e) {
         debugPrint('Error scheduling notifications: $e');
       }
@@ -126,7 +142,7 @@ class _AddingAPersonState extends State<AddingAPerson> {
               gradient: LinearGradient(
                 colors: [
                   Color.fromARGB(255, 255, 0, 0),
-                  Color.fromARGB(255, 255, 255, 255),
+                  Color.fromARGB(115, 255, 255, 255),
                 ],
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,

@@ -76,18 +76,30 @@ class _TextFormState extends State<TextForm> {
         DateTime startDate = dateFormat.parse(_deviceDate.text);
 
         // Используем ключ пользователя как уникальный идентификатор уведомлений
-        await _notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 12)), newUser);
-        await _notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 14)), newUser);
-        await _notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 28)), newUser);
-        await _notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 30)), newUser);
-        await _notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 58)), newUser);
-        await _notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 60)), newUser);
+        _notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 12)),
+            newUser,
+            "Через 2 дня ТЕТ-А-ТЕТ c ${newUser.surname} ${newUser.name} ${newUser.patronymic}");
+        _notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 14)),
+            newUser,
+            "Сегодня день ТЕТ-А-ТЕТ c ${newUser.surname} ${newUser.name} ${newUser.patronymic}");
+        _notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 28)),
+            newUser,
+            "Через 2 дня ТЕТ-А-ТЕТ c ${newUser.surname} ${newUser.name} ${newUser.patronymic}");
+        _notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 30)),
+            newUser,
+            "Сегодня день ТЕТ-А-ТЕТ c ${newUser.surname} ${newUser.name} ${newUser.patronymic}");
+        _notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 58)),
+            newUser,
+            "Через 2 дня ТЕТ-А-ТЕТ c ${newUser.surname} ${newUser.name} ${newUser.patronymic}");
+        _notificationService.scheduleDailyNotification(
+            startDate.add(const Duration(days: 60)),
+            newUser,
+            "Сегодня день ТЕТ-А-ТЕТ c ${newUser.surname} ${newUser.name} ${newUser.patronymic}");
       } catch (e) {
         debugPrint('Error scheduling notifications: $e');
       }
