@@ -177,90 +177,84 @@ class _AddingAPersonState extends State<AddingAPerson> {
                   backgroundColor: Colors.transparent,
                   elevation: 0,
                   flexibleSpace: FlexibleSpaceBar(
-                      centerTitle: true,
-                      title: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
+                    centerTitle: true,
+                    title: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                            child: Padding(
+                          padding: EdgeInsets.fromLTRB(10, 260, 10, 8),
+                          child: Row(
                             children: [
                               if (_isSearching)
                                 Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                        10, 260, 10, 10),
-                                    child: TextField(
-                                      textCapitalization:
-                                          TextCapitalization.words,
-                                      controller: _searchController,
-                                      focusNode: _searchFocusNode,
-                                      decoration: InputDecoration(
-                                        hintText: 'Поиск',
-                                        suffixIcon: IconButton(
-                                          onPressed: _searchController.clear,
-                                          icon: const Icon(
-                                            Icons.clear,
-                                            color: Colors.red,
-                                            size: 20,
-                                          ),
+                                  child: TextField(
+                                    textCapitalization:
+                                        TextCapitalization.words,
+                                    controller: _searchController,
+                                    focusNode: _searchFocusNode,
+                                    decoration: InputDecoration(
+                                      hintText: 'Поиск',
+                                      suffixIcon: IconButton(
+                                        onPressed: _searchController.clear,
+                                        icon: const Icon(
+                                          Icons.clear,
+                                          color: Colors.red,
+                                          size: 20,
                                         ),
                                       ),
                                     ),
                                   ),
                                 )
                               else
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                      10, 260, 10, 10),
-                                  child: IconButton(
-                                    onPressed: _toggleSearch,
-                                    icon: const Icon(
-                                      Icons.search,
-                                      size: 25,
-                                    ),
+                                IconButton(
+                                  onPressed: _toggleSearch,
+                                  icon: const Icon(
+                                    Icons.search,
+                                    size: 25,
                                   ),
                                 ),
                             ],
                           ),
-                          Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                child: IconButton(
-                                  icon: const Icon(
-                                    Icons.info_outline,
-                                    size: 20,
-                                  ),
-                                  color: Colors.black,
-                                  iconSize: 30,
-                                  onPressed: () {
-                                    // Действие при нажатии на иконку
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text(
-                                              'Связь с разработчиком'),
-                                          content: const Text(
-                                              'При обнаружении проблем в приложении прошу обращаться по адресу putslizox@gmail.com '),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              child: const Text('Закрыть'),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                            ),
-                                          ],
-                                        );
-                                      },
+                        )),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.info_outline,
+                                size: 20,
+                              ),
+                              color: Colors.black,
+                              iconSize: 30,
+                              onPressed: () {
+                                // Действие при нажатии на иконку
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title:
+                                          const Text('Связь с разработчиком'),
+                                      content: const Text(
+                                          'При обнаружении проблем в приложении и вопросам его усовершенствования, обращаться по адресу putslizox@gmail.com '),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: const Text('Закрыть'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
                                     );
                                   },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      )),
+                                );
+                              },
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
                 ),
                 BuildPersonListView(
                   scrollOffset: 0.0,
