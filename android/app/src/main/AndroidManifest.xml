@@ -11,7 +11,7 @@
     <application
         android:label="flutter_staff"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/logo">
 
         <!-- Firebase Messaging Meta Data -->
         <meta-data

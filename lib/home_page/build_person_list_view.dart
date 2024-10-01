@@ -63,7 +63,7 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
           final user = widget.users[index];
           final imagePath = user.imagePath?.isNotEmpty == true
               ? user.imagePath!
-              : 'assets/icons/lgv9s1kz-removebg-preview.png';
+              : 'assets/icons/icon_S.png';
 
           return Center(
             child: Container(
@@ -109,7 +109,7 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
                                         fit: BoxFit.cover, errorBuilder:
                                             (context, error, stackTrace) {
                                         return Image.asset(
-                                            'assets/icons/lgv9s1kz-removebg-preview.png');
+                                            'assets/icons/icon_S.png');
                                       }),
                               ),
                             ),
@@ -174,7 +174,31 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
                     right: 5,
                     child: IconButton(
                       onPressed: () {
-                        _deleteUser(user);
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Удалить'),
+                              content: const Text(
+                                  'Вы точно хотите удалить сотрудника ? '),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text('Нет'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                TextButton(
+                                  child: const Text('Да'),
+                                  onPressed: () {
+                                    _deleteUser(user);
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       },
                       icon: const Icon(
                         Icons.delete,

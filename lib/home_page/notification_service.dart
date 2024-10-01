@@ -24,7 +24,7 @@ class NotificationService {
     tz.setLocalLocation(tz.local);
 
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@drawable/my_custom_icon');
 
     const DarwinInitializationSettings initializationSettingsIOS =
         DarwinInitializationSettings(
@@ -72,7 +72,7 @@ class NotificationService {
     try {
       await _notificationsPlugin.zonedSchedule(
         user.key as int, // Используем user.key как уникальный идентификатор
-        "RoSTaf", // Заголовок уведомления
+        "Rostic's Staff", // Заголовок уведомления
         message, // Текст уведомления
         scheduledTime,
         _notificationDetails(),
@@ -82,7 +82,7 @@ class NotificationService {
         matchDateTimeComponents: DateTimeComponents.time,
       );
     } catch (e) {
-      debugPrint('Error scheduling notifications: $e');
+      debugPrint('Ошибка создания уведомлений: $e');
     }
   }
 
