@@ -4,7 +4,6 @@ import 'package:flutter_staff/home_page/formatter_date.dart';
 import 'package:flutter_staff/home_page/notification_service.dart';
 import 'package:flutter_staff/home_page/user.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 
 void showChangePersonListDialog(
     BuildContext context, User user, VoidCallback onUpdate) {
@@ -56,49 +55,7 @@ class _ChangePersonListState extends State<ChangePersonList> {
 
   void _rescheduleNotification(User user) async {
     final notificationService = NotificationService();
-
-    // Отменяем старые уведомления
     await notificationService.cancelNotification(user.key);
-
-    // Планируем новые уведомления
-    _scheduleNotificationsForUser(user);
-  }
-
-  void _scheduleNotificationsForUser(User user) {
-    final NotificationService notificationService = NotificationService();
-    final dateFormat = DateFormat('dd.MM.yyyy');
-
-    if (user.deviceDate.isNotEmpty) {
-      try {
-        DateTime startDate = dateFormat.parse(user.deviceDate);
-        notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 12)),
-            user,
-            "Через 2 дня ТЕТ-А-ТЕТ c ${user.surname} ${user.name} ${user.patronymic}");
-        notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 14)),
-            user,
-            "Сегодня день ТЕТ-А-ТЕТ c ${user.surname} ${user.name} ${user.patronymic}");
-        notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 28)),
-            user,
-            "Через 2 дня ТЕТ-А-ТЕТ c ${user.surname} ${user.name} ${user.patronymic}");
-        notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 30)),
-            user,
-            "Сегодня день ТЕТ-А-ТЕТ c ${user.surname} ${user.name} ${user.patronymic}");
-        notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 58)),
-            user,
-            "Через 2 дня ТЕТ-А-ТЕТ c ${user.surname} ${user.name} ${user.patronymic}");
-        notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 60)),
-            user,
-            "Сегодня день ТЕТ-А-ТЕТ c ${user.surname} ${user.name} ${user.patronymic}");
-      } catch (e) {
-        debugPrint('Error scheduling notifications: $e');
-      }
-    }
   }
 
   @override

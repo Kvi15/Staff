@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_staff/home_page/formatter_date.dart';
+import 'package:flutter_staff/home_page/notification_helper.dart';
 import 'package:flutter_staff/home_page/user.dart';
-import 'package:flutter_staff/home_page/notification_service.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:intl/intl.dart'; // Для работы с датами
 
 class TextForm extends StatefulWidget {
   final Function(User) onEmployeeAdded;
@@ -26,8 +24,6 @@ class _TextFormState extends State<TextForm> {
 
   XFile? _image;
   final ImagePicker _picker = ImagePicker();
-
-  final NotificationService _notificationService = NotificationService();
 
   @override
   void dispose() {
@@ -69,41 +65,8 @@ class _TextFormState extends State<TextForm> {
     final box = Hive.box<User>('users');
     await box.add(newUser); // После этого newUser.key будет доступен
 
-    // Планирование уведомлений
-    if (_deviceDate.text.isNotEmpty) {
-      try {
-        final dateFormat = DateFormat('dd.MM.yyyy');
-        DateTime startDate = dateFormat.parse(_deviceDate.text);
-
-        // Используем ключ пользователя как уникальный идентификатор уведомлений
-        _notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 12)),
-            newUser,
-            "Через 2 дня ТЕТ-А-ТЕТ c ${newUser.surname} ${newUser.name} ${newUser.patronymic}");
-        _notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 14)),
-            newUser,
-            "Сегодня день ТЕТ-А-ТЕТ c ${newUser.surname} ${newUser.name} ${newUser.patronymic}");
-        _notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 28)),
-            newUser,
-            "Через 2 дня ТЕТ-А-ТЕТ c ${newUser.surname} ${newUser.name} ${newUser.patronymic}");
-        _notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 30)),
-            newUser,
-            "Сегодня день ТЕТ-А-ТЕТ c ${newUser.surname} ${newUser.name} ${newUser.patronymic}");
-        _notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 58)),
-            newUser,
-            "Через 2 дня ТЕТ-А-ТЕТ c ${newUser.surname} ${newUser.name} ${newUser.patronymic}");
-        _notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 60)),
-            newUser,
-            "Сегодня день ТЕТ-А-ТЕТ c ${newUser.surname} ${newUser.name} ${newUser.patronymic}");
-      } catch (e) {
-        debugPrint('Error scheduling notifications: $e');
-      }
-    }
+    // Планирование уведомлений через NotificationHelper
+    NotificationHelper.scheduleNotificationsForUser(newUser);
 
     widget.onEmployeeAdded(newUser);
 

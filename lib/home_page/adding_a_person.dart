@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_staff/home_page/build_person_list_view.dart';
-import 'package:flutter_staff/home_page/notification_service.dart';
 import 'package:flutter_staff/home_page/text_form.dart';
 import 'package:flutter_staff/home_page/user.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:intl/intl.dart';
 
 class AddingAPerson extends StatefulWidget {
   final Box<User> userBox;
@@ -35,57 +32,12 @@ class _AddingAPersonState extends State<AddingAPerson> {
   void _addUser(User user) {
     setState(() {
       if (user.isInBox) {
-        // Если пользователь уже сохранен, просто обновляем его данные
         user.save();
       } else {
-        // Если пользователь новый, добавляем его в коробку
         userBox.add(user);
-
-        // Планирование уведомлений только для нового пользователя
-        _scheduleNotificationsForUser(user);
       }
       _filteredUsers = userBox.values.toList();
     });
-  }
-
-  void _scheduleNotificationsForUser(User user) {
-    final NotificationService notificationService = NotificationService();
-    final dateFormat = DateFormat('dd.MM.yyyy');
-
-    if (user.deviceDate.isNotEmpty) {
-      try {
-        DateTime startDate = dateFormat.parse(user.deviceDate);
-
-        String fullName = "${user.surname} ${user.name} ${user.patronymic}";
-
-        notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 12)),
-            user,
-            "Через 2 дня ТЕТ-А-ТЕТ c $fullName");
-        notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 14)),
-            user,
-            "Сегодня день ТЕТ-А-ТЕТ c $fullName");
-        notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 28)),
-            user,
-            "Через 2 дня ТЕТ-А-ТЕТ c $fullName");
-        notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 30)),
-            user,
-            "Сегодня день ТЕТ-А-ТЕТ c $fullName");
-        notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 58)),
-            user,
-            "Через 2 дня ТЕТ-А-ТЕТ c $fullName");
-        notificationService.scheduleDailyNotification(
-            startDate.add(const Duration(days: 60)),
-            user,
-            "Сегодня день ТЕТ-А-ТЕТ c $fullName");
-      } catch (e) {
-        debugPrint('Error scheduling notifications: $e');
-      }
-    }
   }
 
   void _toggleSearch() {
@@ -184,7 +136,7 @@ class _AddingAPersonState extends State<AddingAPerson> {
                       children: [
                         Expanded(
                             child: Padding(
-                          padding: EdgeInsets.fromLTRB(10, 260, 10, 8),
+                          padding: const EdgeInsets.fromLTRB(10, 260, 10, 8),
                           child: Row(
                             children: [
                               if (_isSearching)
