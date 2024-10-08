@@ -19,8 +19,6 @@ class NotificationService {
   Future<void> init() async {
     // Инициализация Timezone
     tz.initializeTimeZones();
-
-    // Вместо явного указания имени временной зоны, используйте локальную зону
     tz.setLocalLocation(tz.local);
 
     const AndroidInitializationSettings initializationSettingsAndroid =
@@ -58,20 +56,18 @@ class NotificationService {
     );
   }
 
-  Future<void> scheduleDailyNotification(
-      DateTime selectedDate, User user, String message) async {
-    // Используем локальное время, чтобы избежать сдвига на UTC
+  Future<void> scheduleNotification(DateTime scheduledDate, User user,
+      String message, int notificationId) async {
     final tz.TZDateTime scheduledTime = tz.TZDateTime.local(
-      selectedDate.year,
-      selectedDate.month,
-      selectedDate.day,
-      8, // Час уведомления (например, 8 утра)
-      0, // Минута
+      scheduledDate.year,
+      scheduledDate.month,
+      scheduledDate.day,
+      8, // Время уведомления (например, 8 утра)
     );
 
     try {
       await _notificationsPlugin.zonedSchedule(
-        user.key as int, // Используем user.key как уникальный идентификатор
+        notificationId, // Уникальный идентификатор для каждого уведомления
         "Rostic's Staff", // Заголовок уведомления
         message, // Текст уведомления
         scheduledTime,
@@ -79,8 +75,9 @@ class NotificationService {
         androidAllowWhileIdle: true,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.time,
       );
+      debugPrint(
+          'Запланировано уведомление с ID $notificationId на $scheduledDate');
     } catch (e) {
       debugPrint('Ошибка создания уведомлений: $e');
     }
