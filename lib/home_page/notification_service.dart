@@ -62,7 +62,7 @@ class NotificationService {
       scheduledDate.year,
       scheduledDate.month,
       scheduledDate.day,
-      8, // Время уведомления (например, 8 утра)
+      8, // Время уведомления
     );
 
     try {
