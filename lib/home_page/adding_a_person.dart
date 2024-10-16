@@ -3,6 +3,7 @@ import 'package:flutter_staff/home_page/adding_person_view.dart';
 import 'package:flutter_staff/home_page/search_utils.dart';
 import 'package:flutter_staff/home_page/user.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
 
 class AddingAPerson extends StatefulWidget {
   final Box<User> userBox;
@@ -20,18 +21,64 @@ class _AddingAPersonState extends State<AddingAPerson> {
   final FocusNode _searchFocusNode = FocusNode();
   bool _isSearching = false;
   List<User> _filteredUsers = [];
+  int _selectedFilter =
+      1; // По умолчанию, сортировка по дате устройства от большего к меньшему
 
   @override
   void initState() {
     super.initState();
     userBox = widget.userBox;
-
-    // Загружаем данные пользователей в кэш
     _userCache = userBox.values.toList();
     _filteredUsers = _userCache;
-
     _searchController.addListener(_updateSearchState);
     _searchFocusNode.addListener(_handleFocusChange);
+    _sortUsers();
+  }
+
+  void _sortUsers() {
+    setState(() {
+      _filteredUsers.sort((a, b) {
+        DateTime deviceDateA, deviceDateB, medicalDateA, medicalDateB;
+
+        try {
+          deviceDateA = DateFormat('dd.MM.yyyy').parse(a.deviceDate);
+        } catch (e) {
+          deviceDateA =
+              DateTime(0); // Значение по умолчанию, если парсинг не удался
+        }
+
+        try {
+          deviceDateB = DateFormat('dd.MM.yyyy').parse(b.deviceDate);
+        } catch (e) {
+          deviceDateB = DateTime(0);
+        }
+
+        try {
+          medicalDateA = DateFormat('dd.MM.yyyy').parse(a.medicalBook);
+        } catch (e) {
+          medicalDateA = DateTime(0);
+        }
+
+        try {
+          medicalDateB = DateFormat('dd.MM.yyyy').parse(b.medicalBook);
+        } catch (e) {
+          medicalDateB = DateTime(0);
+        }
+
+        switch (_selectedFilter) {
+          case 1: // По дате устройства от большего к меньшему
+            return deviceDateB.compareTo(deviceDateA);
+          case 2: // По дате устройства от меньшего к большему
+            return deviceDateA.compareTo(deviceDateB);
+          case 3: // По дате мед книжки от большего к меньшему
+            return medicalDateB.compareTo(medicalDateA);
+          case 4: // По дате мед книжки от меньшего к большему
+            return medicalDateA.compareTo(medicalDateB);
+          default:
+            return 0;
+        }
+      });
+    });
   }
 
   void _addUser(User user) {
@@ -42,7 +89,15 @@ class _AddingAPersonState extends State<AddingAPerson> {
         userBox.add(user);
       }
       _userCache = userBox.values.toList(); // Обновляем кэш
-      _filteredUsers = _userCache; // Обновляем отображение
+      _filteredUsers = _userCache;
+      _sortUsers(); // Применяем сортировку после добавления
+    });
+  }
+
+  void _onFilterChanged(int filterOption) {
+    setState(() {
+      _selectedFilter = filterOption;
+      _sortUsers();
     });
   }
 
@@ -56,6 +111,7 @@ class _AddingAPersonState extends State<AddingAPerson> {
   void _updateSearchState() {
     setState(() {
       _filteredUsers = updateSearchState(_searchController, _userCache);
+      _sortUsers();
     });
   }
 
@@ -82,6 +138,7 @@ class _AddingAPersonState extends State<AddingAPerson> {
       searchFocusNode: _searchFocusNode,
       toggleSearch: _toggleSearch,
       addUser: _addUser,
+      onFilterChanged: _onFilterChanged, // Передаем обработчик
     );
   }
 }

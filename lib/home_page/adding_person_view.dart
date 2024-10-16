@@ -10,6 +10,7 @@ class AddingPersonView extends StatelessWidget {
   final FocusNode searchFocusNode;
   final VoidCallback toggleSearch;
   final void Function(User) addUser;
+  final Function(int) onFilterChanged; // Новый колбэк для изменения фильтра
 
   const AddingPersonView({
     super.key,
@@ -19,6 +20,7 @@ class AddingPersonView extends StatelessWidget {
     required this.searchFocusNode,
     required this.toggleSearch,
     required this.addUser,
+    required this.onFilterChanged,
   });
 
   @override
@@ -64,30 +66,68 @@ class AddingPersonView extends StatelessWidget {
                   elevation: 0,
                   flexibleSpace: FlexibleSpaceBar(
                     centerTitle: true,
-                    title: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    title: Column(
                       children: [
+                        const Spacer(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                              child: IconButton(
+                                icon: const Icon(Icons.info_outline, size: 20),
+                                color: Colors.black,
+                                iconSize: 30,
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title:
+                                            const Text('Связь с разработчиком'),
+                                        content: const Text(
+                                            'Обратитесь по адресу putslizox@gmail.com'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            child: const Text('Закрыть'),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 260, 10, 8),
+                            padding: const EdgeInsets.fromLTRB(0, 100, 0, 0),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 if (isSearching)
                                   Expanded(
-                                    child: TextField(
-                                      textCapitalization:
-                                          TextCapitalization.words,
-                                      controller: searchController,
-                                      focusNode: searchFocusNode,
-                                      decoration: InputDecoration(
-                                        hintText: 'Поиск',
-                                        suffixIcon: IconButton(
-                                          onPressed: searchController.clear,
-                                          icon: const Icon(
-                                            Icons.clear,
-                                            color: Colors.red,
-                                            size: 20,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: TextField(
+                                        textCapitalization:
+                                            TextCapitalization.words,
+                                        controller: searchController,
+                                        focusNode: searchFocusNode,
+                                        decoration: InputDecoration(
+                                          hintText: 'Поиск',
+                                          suffixIcon: IconButton(
+                                            onPressed: searchController.clear,
+                                            icon: const Icon(
+                                              Icons.clear,
+                                              color:
+                                                  Color.fromARGB(255, 0, 0, 0),
+                                              size: 20,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -101,37 +141,35 @@ class AddingPersonView extends StatelessWidget {
                                       size: 25,
                                     ),
                                   ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  child: PopupMenuButton<int>(
+                                    icon: const Icon(Icons.filter_list),
+                                    onSelected: onFilterChanged,
+                                    itemBuilder: (context) => [
+                                      const PopupMenuItem(
+                                        value: 1,
+                                        child: Text("Сначала новый сотрудник"),
+                                      ),
+                                      const PopupMenuItem(
+                                        value: 2,
+                                        child: Text("Сначала старый сотрудник"),
+                                      ),
+                                      const PopupMenuItem(
+                                        value: 3,
+                                        child: Text("Сначал новая книжка"),
+                                      ),
+                                      const PopupMenuItem(
+                                        value: 4,
+                                        child: Text("Сначала старая книжка"),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.info_outline,
-                            size: 20,
-                          ),
-                          color: Colors.black,
-                          iconSize: 30,
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('Связь с разработчиком'),
-                                  content: const Text(
-                                      'Обратитесь по адресу putslizox@gmail.com'),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      child: const Text('Закрыть'),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
                         ),
                       ],
                     ),
