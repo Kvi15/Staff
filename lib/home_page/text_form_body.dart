@@ -16,7 +16,7 @@ class TextFormBody extends StatelessWidget {
   final XFile? image;
 
   const TextFormBody({
-    Key? key,
+    super.key,
     required this.surnameController,
     required this.nameController,
     required this.patronymicController,
@@ -26,7 +26,7 @@ class TextFormBody extends StatelessWidget {
     required this.onPickImage,
     required this.onSave,
     this.image,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

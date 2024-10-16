@@ -10,7 +10,7 @@ class AddingPersonView extends StatelessWidget {
   final FocusNode searchFocusNode;
   final VoidCallback toggleSearch;
   final void Function(User) addUser;
-  final Function(int) onFilterChanged; // Новый колбэк для изменения фильтра
+  final Function(int) onFilterChanged;
 
   const AddingPersonView({
     super.key,
@@ -23,6 +23,35 @@ class AddingPersonView extends StatelessWidget {
     required this.onFilterChanged,
   });
 
+  // Вынесенные параметры
+  static const BoxDecoration backgroundDecoration = BoxDecoration(
+    gradient: LinearGradient(
+      colors: [
+        Color.fromARGB(255, 255, 0, 0),
+        Color.fromARGB(115, 255, 255, 255),
+      ],
+      begin: Alignment.bottomCenter,
+      end: Alignment.topCenter,
+    ),
+  );
+
+  static const InputDecoration searchInputDecoration = InputDecoration(
+    hintText: 'Поиск',
+    suffixIcon: Icon(
+      Icons.clear,
+      color: Color.fromARGB(255, 0, 0, 0),
+      size: 20,
+    ),
+  );
+
+  static const TextStyle dialogTitleStyle = TextStyle(
+    fontWeight: FontWeight.bold,
+  );
+
+  static const TextStyle dialogContentStyle = TextStyle(
+    fontSize: 16,
+  );
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -31,26 +60,18 @@ class AddingPersonView extends StatelessWidget {
         body: Stack(
           children: [
             Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color.fromARGB(255, 255, 0, 0),
-                    Color.fromARGB(115, 255, 255, 255),
-                  ],
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                ),
-              ),
-              child: Center(
+              decoration: backgroundDecoration,
+              child: const Center(
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(top: 60),
+                      padding: EdgeInsets.only(top: 60),
                       child: SizedBox(
                         height: 200,
                         width: 200,
-                        child: Image.asset(
-                          'assets/icons/lgv9s1kz-removebg-preview.png',
+                        child: Image(
+                          image: AssetImage('assets/icons/background_logo.png'),
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
@@ -72,34 +93,32 @@ class AddingPersonView extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                              child: IconButton(
-                                icon: const Icon(Icons.info_outline, size: 20),
-                                color: Colors.black,
-                                iconSize: 30,
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title:
-                                            const Text('Связь с разработчиком'),
-                                        content: const Text(
-                                            'Обратитесь по адресу putslizox@gmail.com'),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            child: const Text('Закрыть'),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
+                            IconButton(
+                              icon: const Icon(Icons.info_outline, size: 20),
+                              color: Colors.black,
+                              iconSize: 30,
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text('Связь с разработчиком',
+                                          style: dialogTitleStyle),
+                                      content: const Text(
+                                          'Обратитесь по адресу putslizox@gmail.com',
+                                          style: dialogContentStyle),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: const Text('Закрыть'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -118,18 +137,7 @@ class AddingPersonView extends StatelessWidget {
                                             TextCapitalization.words,
                                         controller: searchController,
                                         focusNode: searchFocusNode,
-                                        decoration: InputDecoration(
-                                          hintText: 'Поиск',
-                                          suffixIcon: IconButton(
-                                            onPressed: searchController.clear,
-                                            icon: const Icon(
-                                              Icons.clear,
-                                              color:
-                                                  Color.fromARGB(255, 0, 0, 0),
-                                              size: 20,
-                                            ),
-                                          ),
-                                        ),
+                                        decoration: searchInputDecoration,
                                       ),
                                     ),
                                   )
@@ -158,7 +166,7 @@ class AddingPersonView extends StatelessWidget {
                                       ),
                                       const PopupMenuItem(
                                         value: 3,
-                                        child: Text("Сначал новая книжка"),
+                                        child: Text("Сначала новая книжка"),
                                       ),
                                       const PopupMenuItem(
                                         value: 4,
