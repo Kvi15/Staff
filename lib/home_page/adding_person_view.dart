@@ -28,6 +28,26 @@ class AddingPersonView extends StatefulWidget {
 }
 
 class AddingPersonViewState extends State<AddingPersonView> {
+  static const _backgroundDecoration = BoxDecoration(
+    gradient: LinearGradient(
+      colors: [
+        Color.fromARGB(255, 255, 0, 0),
+        Color.fromARGB(115, 255, 255, 255),
+      ],
+      begin: Alignment.bottomCenter,
+      end: Alignment.topCenter,
+    ),
+  );
+
+  static const _inputDecoration = InputDecoration(
+    hintText: 'Поиск',
+    suffixIcon: Icon(
+      Icons.clear,
+      color: Color.fromARGB(255, 0, 0, 0),
+      size: 20,
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -56,16 +76,7 @@ class AddingPersonViewState extends State<AddingPersonView> {
     return Stack(
       children: [
         Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color.fromARGB(255, 255, 0, 0),
-                Color.fromARGB(115, 255, 255, 255),
-              ],
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-            ),
-          ),
+          decoration: _backgroundDecoration,
         ),
         const Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -134,14 +145,7 @@ class AddingPersonViewState extends State<AddingPersonView> {
                     textCapitalization: TextCapitalization.words,
                     controller: widget.searchController,
                     focusNode: widget.searchFocusNode,
-                    decoration: const InputDecoration(
-                      hintText: 'Поиск',
-                      suffixIcon: Icon(
-                        Icons.clear,
-                        color: Color.fromARGB(255, 0, 0, 0),
-                        size: 20,
-                      ),
-                    ),
+                    decoration: _inputDecoration,
                   ),
                 ),
               )
@@ -187,26 +191,7 @@ class AddingPersonViewState extends State<AddingPersonView> {
   Widget _buildFloatingActionButton() {
     return FloatingActionButton(
       backgroundColor: const Color.fromARGB(255, 255, 17, 0),
-      onPressed: () {
-        showModalBottomSheet<User>(
-          isScrollControlled: true,
-          context: context,
-          builder: (BuildContext context) {
-            return ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(25),
-                topRight: Radius.circular(25),
-              ),
-              child: FractionallySizedBox(
-                heightFactor: 0.53,
-                child: TextForm(
-                  onEmployeeAdded: widget.addUser,
-                ),
-              ),
-            );
-          },
-        );
-      },
+      onPressed: _showAddUserForm,
       child: const Icon(
         Icons.person_add,
         color: Color.fromARGB(255, 255, 255, 255),
@@ -234,6 +219,27 @@ class AddingPersonViewState extends State<AddingPersonView> {
               },
             ),
           ],
+        );
+      },
+    );
+  }
+
+  void _showAddUserForm() {
+    showModalBottomSheet<User>(
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(25),
+            topRight: Radius.circular(25),
+          ),
+          child: FractionallySizedBox(
+            heightFactor: 0.53,
+            child: TextForm(
+              onEmployeeAdded: widget.addUser,
+            ),
+          ),
         );
       },
     );

@@ -89,8 +89,8 @@ class _AddingAPersonState extends State<AddingAPerson> {
         userBox.add(user);
       }
       _userCache = userBox.values.toList(); // Обновляем кэш
-      _filteredUsers = _userCache;
-      _sortUsers(); // Применяем сортировку после добавления
+      _filteredUsers = _userCache; // Применяем изменения в одном вызове
+      _sortUsers(); // Сортировка после добавления
     });
   }
 
@@ -109,10 +109,13 @@ class _AddingAPersonState extends State<AddingAPerson> {
   }
 
   void _updateSearchState() {
-    setState(() {
-      _filteredUsers = updateSearchState(_searchController, _userCache);
-      _sortUsers();
-    });
+    final newFilteredUsers = updateSearchState(_searchController, _userCache);
+    if (_filteredUsers != newFilteredUsers) {
+      setState(() {
+        _filteredUsers = newFilteredUsers;
+        // Не сортируйте здесь, вызывайте сортировку только в фильтре или добавлении
+      });
+    }
   }
 
   void _handleFocusChange() {
@@ -138,7 +141,7 @@ class _AddingAPersonState extends State<AddingAPerson> {
       searchFocusNode: _searchFocusNode,
       toggleSearch: _toggleSearch,
       addUser: _addUser,
-      onFilterChanged: _onFilterChanged, // Передаем обработчик
+      onFilterChanged: _onFilterChanged,
     );
   }
 }
