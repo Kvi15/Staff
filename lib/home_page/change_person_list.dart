@@ -25,10 +25,10 @@ class ChangePersonList extends StatefulWidget {
   });
 
   @override
-  _ChangePersonListState createState() => _ChangePersonListState();
+  ChangePersonListState createState() => ChangePersonListState();
 }
 
-class _ChangePersonListState extends State<ChangePersonList> {
+class ChangePersonListState extends State<ChangePersonList> {
   late TextEditingController _surnameController;
   late TextEditingController _nameController;
   late TextEditingController _patronymicController;
@@ -79,9 +79,11 @@ class _ChangePersonListState extends State<ChangePersonList> {
     });
 
     widget.user.save().then((_) {
-      _rescheduleNotification(widget.user);
-      widget.onUpdate();
-      Navigator.of(context).pop();
+      if (mounted) {
+        _rescheduleNotification(widget.user);
+        widget.onUpdate();
+        Navigator.of(context).pop();
+      }
     });
   }
 
