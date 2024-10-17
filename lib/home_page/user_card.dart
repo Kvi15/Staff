@@ -15,14 +15,21 @@ class UserCard extends StatelessWidget {
     required this.onDelete,
   });
 
+  String get _imagePath => user.imagePath?.isNotEmpty == true
+      ? user.imagePath!
+      : 'assets/icons/icon_S.png';
+
+  Widget _buildText(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 3),
+      child: Text(text, style: const TextStyle(fontSize: 16)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final imagePath = user.imagePath?.isNotEmpty == true
-        ? user.imagePath!
-        : 'assets/icons/icon_S.png';
-
     return Container(
-      height: 200,
+      height: 215,
       margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
       decoration: BoxDecoration(
         boxShadow: const [
@@ -33,7 +40,7 @@ class UserCard extends StatelessWidget {
             offset: Offset(0, 3),
           ),
         ],
-        color: const Color.fromARGB(255, 255, 255, 255),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(25),
       ),
       child: Stack(
@@ -45,46 +52,9 @@ class UserCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      height: 130,
-                      width: 130,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: imagePath.startsWith('assets/')
-                            ? Image.asset(imagePath, fit: BoxFit.cover)
-                            : Image.file(File(imagePath), fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                return Image.asset('assets/icons/icon_S.png');
-                              }),
-                      ),
-                    ),
+                    _buildImage(),
                     const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(user.surname),
-                        const SizedBox(height: 3),
-                        Text(user.name),
-                        const SizedBox(height: 3),
-                        Text(user.patronymic),
-                        const SizedBox(height: 3),
-                        Text(user.number),
-                        const SizedBox(height: 3),
-                        Row(
-                          children: [
-                            const Icon(Icons.directions_walk, size: 15),
-                            Text(user.deviceDate),
-                          ],
-                        ),
-                        const SizedBox(height: 3),
-                        Row(
-                          children: [
-                            const Icon(Icons.import_contacts, size: 15),
-                            Text(user.medicalBook),
-                          ],
-                        ),
-                      ],
-                    ),
+                    Expanded(child: _buildUserInfo()),
                   ],
                 ),
                 Padding(
@@ -112,6 +82,52 @@ class UserCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildImage() {
+    return SizedBox(
+      height: 130,
+      width: 130,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: _imagePath.startsWith('assets/')
+            ? Image.asset(_imagePath, fit: BoxFit.cover)
+            : Image.file(
+                File(_imagePath),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset('assets/icons/icon_S.png',
+                      fit: BoxFit.cover);
+                },
+              ),
+      ),
+    );
+  }
+
+  Widget _buildUserInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildText(user.surname),
+        _buildText(user.name),
+        _buildText(user.patronymic),
+        _buildText(user.number),
+        Row(
+          children: [
+            const Icon(Icons.directions_walk, size: 15),
+            const SizedBox(width: 4),
+            Text(user.deviceDate, style: const TextStyle(fontSize: 16)),
+          ],
+        ),
+        Row(
+          children: [
+            const Icon(Icons.import_contacts, size: 15),
+            const SizedBox(width: 4),
+            Text(user.medicalBook, style: const TextStyle(fontSize: 16)),
+          ],
+        ),
+      ],
     );
   }
 

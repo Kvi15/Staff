@@ -28,6 +28,20 @@ class TextFormBody extends StatelessWidget {
     this.image,
   });
 
+  InputDecoration _buildInputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      enabledBorder: const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(30)),
+        borderSide: BorderSide(color: Colors.black),
+      ),
+      focusedBorder: const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(30)),
+        borderSide: BorderSide(color: Colors.black),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,10 +57,7 @@ class TextFormBody extends StatelessWidget {
             ),
             IconButton(
               onPressed: onSave,
-              icon: const Icon(
-                Icons.save,
-                size: 35,
-              ),
+              icon: const Icon(Icons.save, size: 35),
             ),
           ],
         ),
@@ -73,20 +84,24 @@ class TextFormBody extends StatelessWidget {
                       border: Border.all(color: Colors.grey, width: 2),
                     ),
                     child: image == null
-                        ? const Center(
-                            child: Icon(
-                              Icons.person,
-                              size: 80,
-                            ),
-                          )
-                        : ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Image.file(
-                              File(image!.path),
-                              fit: BoxFit.cover,
-                              width: 150,
-                              height: 170,
-                            ),
+                        ? const Center(child: Icon(Icons.person, size: 80))
+                        : FutureBuilder<File>(
+                            future: Future.value(File(image!.path)),
+                            builder: (context, snapshot) {
+                              return snapshot.connectionState ==
+                                      ConnectionState.done
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: Image.file(
+                                        snapshot.data!,
+                                        fit: BoxFit.cover,
+                                        width: 150,
+                                        height: 170,
+                                      ),
+                                    )
+                                  : const Center(
+                                      child: CircularProgressIndicator());
+                            },
                           ),
                   ),
                 ),
@@ -96,49 +111,19 @@ class TextFormBody extends StatelessWidget {
                       TextFormField(
                         textCapitalization: TextCapitalization.words,
                         controller: surnameController,
-                        decoration: const InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(30)),
-                            borderSide: BorderSide(color: Colors.black),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(30)),
-                            borderSide: BorderSide(color: Colors.black),
-                          ),
-                          labelText: 'Фамилия',
-                        ),
+                        decoration: _buildInputDecoration('Фамилия'),
                       ),
                       const SizedBox(height: 20),
                       TextFormField(
                         textCapitalization: TextCapitalization.words,
                         controller: nameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Имя',
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(30)),
-                            borderSide: BorderSide(color: Colors.black),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(30)),
-                            borderSide: BorderSide(color: Colors.black),
-                          ),
-                        ),
+                        decoration: _buildInputDecoration('Имя'),
                       ),
                       const SizedBox(height: 20),
                       TextFormField(
                         textCapitalization: TextCapitalization.words,
                         controller: patronymicController,
-                        decoration: const InputDecoration(
-                          labelText: 'Отчество',
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(30)),
-                            borderSide: BorderSide(color: Colors.black),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(30)),
-                            borderSide: BorderSide(color: Colors.black),
-                          ),
-                        ),
+                        decoration: _buildInputDecoration('Отчество'),
                       ),
                       const SizedBox(height: 15),
                     ],
@@ -149,17 +134,7 @@ class TextFormBody extends StatelessWidget {
             TextFormField(
               keyboardType: TextInputType.phone,
               controller: numberController,
-              decoration: const InputDecoration(
-                labelText: 'Номер телефона',
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                  borderSide: BorderSide(color: Colors.black),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                  borderSide: BorderSide(color: Colors.black),
-                ),
-              ),
+              decoration: _buildInputDecoration('Номер телефона'),
             ),
             const SizedBox(height: 20),
             Padding(
@@ -171,17 +146,7 @@ class TextFormBody extends StatelessWidget {
                       inputFormatters: [FormatterDate()],
                       keyboardType: TextInputType.number,
                       controller: deviceDateController,
-                      decoration: const InputDecoration(
-                        labelText: 'Дата устройства',
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
-                          borderSide: BorderSide(color: Colors.black),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
-                          borderSide: BorderSide(color: Colors.black),
-                        ),
-                      ),
+                      decoration: _buildInputDecoration('Дата устройства'),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -190,27 +155,11 @@ class TextFormBody extends StatelessWidget {
                       inputFormatters: [FormatterDate()],
                       keyboardType: TextInputType.number,
                       controller: medicalBookController,
-                      decoration: const InputDecoration(
-                        labelText: 'Медкнижка',
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
-                          borderSide: BorderSide(color: Colors.black),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
-                          borderSide: BorderSide(color: Colors.black),
-                        ),
-                      ),
+                      decoration: _buildInputDecoration('Медкнижка'),
                     ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: onSave,
-              icon: const Icon(Icons.save, size: 24),
-              label: const Text('Сохранить'),
             ),
           ],
         ),

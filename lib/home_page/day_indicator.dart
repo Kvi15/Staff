@@ -9,113 +9,81 @@ class DayIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DateTime startDate;
+    DateTime? startDate;
     try {
       startDate = DateFormat('dd.MM.yyyy').parse(startDateString);
     } catch (e) {
       return const Text('Неверный формат даты устройства');
     }
 
+    final daysPassed = DateTime.now().difference(startDate).inDays;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        children: [
-          _buildDayIndicator(context, startDate),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDayIndicator(BuildContext context, DateTime startDate) {
-    int daysPassed = DateTime.now().difference(startDate).inDays;
-
-    // Если прошло больше 60 дней, мы отображаем индикатор с пометкой превышения
-    if (daysPassed > 60) {
-      return CustomPaint(
+      child: CustomPaint(
         size: const Size(double.infinity, 50),
-        painter: DayIndicatorPainter(daysPassed: daysPassed, exceeded: true),
-      );
-    }
-
-    return CustomPaint(
-      size: const Size(double.infinity, 50),
-      painter: DayIndicatorPainter(daysPassed: daysPassed),
+        painter: DayIndicatorPainter(daysPassed: daysPassed),
+      ),
     );
   }
 }
 
 class DayIndicatorPainter extends CustomPainter {
   final int daysPassed;
-  final int totalDays = 60; // Общее количество дней для заполнения
-  final bool exceeded;
+  final int totalDays = 60;
 
-  DayIndicatorPainter({required this.daysPassed, this.exceeded = false});
+  DayIndicatorPainter({required this.daysPassed});
 
   @override
   void paint(Canvas canvas, Size size) {
-    Paint linePaint = Paint()
+    final double lineY = size.height / 2;
+    final double endX = size.width;
+    final double passedFraction = (daysPassed / totalDays).clamp(0.0, 1.0);
+
+    final linePaint = Paint()
       ..color = Colors.grey
       ..strokeWidth = 2;
 
-    double startX = 0;
-    double endX = size.width;
-    double lineY = size.height / 2;
-
-    // Доля пройденных дней
-    double passedFraction = (daysPassed / totalDays).clamp(0.0, 1.0);
-
-    // Нарисовать синюю часть
-    Paint passedPaint = Paint()
+    final passedPaint = Paint()
       ..color = const Color.fromARGB(255, 0, 34, 255)
       ..strokeWidth = 2;
-    canvas.drawLine(Offset(startX, lineY), Offset(passedFraction * endX, lineY),
-        passedPaint);
 
-    // Нарисовать серую часть
+    // Сначала рисуем серую линию на всю ширину, затем синий индикатор
+    canvas.drawLine(Offset(0, lineY), Offset(endX, lineY), linePaint);
     canvas.drawLine(
-        Offset(passedFraction * endX, lineY), Offset(endX, lineY), linePaint);
+        Offset(0, lineY), Offset(passedFraction * endX, lineY), passedPaint);
 
-    // Нарисовать круги для отметок дней
-    double circleRadius = 5;
-    List<int> dayMarks = [14, 30, 60];
-    for (int i = 0; i < dayMarks.length; i++) {
-      double x = (dayMarks[i] / totalDays) * size.width;
-      Paint circlePaint = Paint()
-        ..color = (daysPassed >= dayMarks[i])
-            ? const Color.fromARGB(255, 0, 34, 255)
-            : Colors.grey;
+    // Рисуем отметки дней и текст с надписью количества дней
+    const List<int> dayMarks = [14, 30, 60];
+    const double circleRadius = 5;
+    final textStyle = TextStyle(color: Colors.black, fontSize: 12);
+
+    for (final dayMark in dayMarks) {
+      final double x = (dayMark / totalDays) * size.width;
+
+      // Краска для кругов
+      final circlePaint = Paint()
+        ..color = daysPassed >= dayMark ? passedPaint.color : Colors.grey;
       canvas.drawCircle(Offset(x, lineY), circleRadius, circlePaint);
 
-      // Добавить текст под кругами
-      TextSpan span = TextSpan(
-        style: const TextStyle(
-          color: Colors.black,
-          fontSize: 12,
-        ),
-        text: '${dayMarks[i]} дней',
-      );
-
-      TextPainter tp = TextPainter(
-        text: span,
+      // Рисуем текст под кругами
+      final textSpan = TextSpan(style: textStyle, text: '$dayMark дней');
+      final textPainter = TextPainter(
+        text: textSpan,
         textAlign: TextAlign.center,
         textDirection: ui.TextDirection.ltr,
-      );
+      )..layout();
 
-      tp.layout();
-
-      tp.paint(canvas, Offset(x - (tp.width / 2), lineY + 10));
+      textPainter.paint(
+          canvas, Offset(x - (textPainter.width / 2), lineY + 10));
     }
 
-    // Нарисовать вертикальную черту в начале линии
-    Paint verticalLinePaint = Paint()
-      ..color = const Color.fromARGB(255, 0, 34, 255)
-      ..strokeWidth = 2;
-    canvas.drawLine(Offset(startX, lineY - 5), Offset(startX, lineY + 5),
-        verticalLinePaint);
+    // Вертикальная черта в начале линии
+    canvas.drawLine(Offset(0, lineY - 5), Offset(0, lineY + 5), passedPaint);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
+  bool shouldRepaint(DayIndicatorPainter oldDelegate) {
+    return oldDelegate.daysPassed != daysPassed;
   }
 }

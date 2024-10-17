@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_staff/home_page/formatter_date.dart';
 import 'package:flutter_staff/home_page/user.dart';
 
-class ChangePersonListUI extends StatelessWidget {
+class ChangePersonListUI extends StatefulWidget {
   final User user;
   final XFile? image;
   final VoidCallback onUpdate;
@@ -33,78 +33,39 @@ class ChangePersonListUI extends StatelessWidget {
   });
 
   @override
+  _ChangePersonListUIState createState() => _ChangePersonListUIState();
+}
+
+class _ChangePersonListUIState extends State<ChangePersonListUI> {
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Изменить данные'),
       contentPadding: EdgeInsets.zero,
       insetPadding: const EdgeInsets.symmetric(horizontal: 30),
       content: SizedBox(
-        width: dialogWidth,
+        width: widget.dialogWidth,
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               children: <Widget>[
-                GestureDetector(
-                  onTap: pickImage,
-                  child: Container(
-                    margin: const EdgeInsets.all(15.0),
-                    width: 150,
-                    height: 150,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Colors.grey, width: 2),
-                    ),
-                    child: image == null
-                        ? const Center(
-                            child: Icon(
-                              Icons.person,
-                              size: 80,
-                            ),
-                          )
-                        : ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
-                            child: Image.file(
-                              File(image!.path),
-                              fit: BoxFit.cover,
-                              width: 150,
-                              height: 150,
-                            ),
-                          ),
-                  ),
-                ),
-                TextField(
-                  textCapitalization: TextCapitalization.words,
-                  controller: surnameController,
-                  decoration: const InputDecoration(labelText: 'Фамилия'),
-                ),
-                TextField(
-                  textCapitalization: TextCapitalization.words,
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Имя'),
-                ),
-                TextField(
-                  textCapitalization: TextCapitalization.words,
-                  controller: patronymicController,
-                  decoration: const InputDecoration(labelText: 'Отчество'),
-                ),
-                TextField(
-                  controller: numberController,
-                  decoration:
-                      const InputDecoration(labelText: 'Номер телефона'),
-                ),
-                TextField(
-                  inputFormatters: [FormatterDate()],
-                  controller: deviceDateController,
-                  decoration:
-                      const InputDecoration(labelText: 'Дата устройства'),
-                ),
-                TextField(
-                  inputFormatters: [FormatterDate()],
-                  controller: medicalBookController,
-                  decoration: const InputDecoration(labelText: 'Медкнижка'),
-                ),
+                _buildImagePicker(),
+                _buildTextField(
+                    controller: widget.surnameController, label: 'Фамилия'),
+                _buildTextField(
+                    controller: widget.nameController, label: 'Имя'),
+                _buildTextField(
+                    controller: widget.patronymicController, label: 'Отчество'),
+                _buildTextField(
+                    controller: widget.numberController,
+                    label: 'Номер телефона'),
+                _buildDateField(
+                    controller: widget.deviceDateController,
+                    label: 'Дата устройства'),
+                _buildDateField(
+                    controller: widget.medicalBookController,
+                    label: 'Медкнижка'),
               ],
             ),
           ),
@@ -112,10 +73,60 @@ class ChangePersonListUI extends StatelessWidget {
       ),
       actions: <Widget>[
         ElevatedButton(
-          onPressed: onUpdate,
+          onPressed: widget.onUpdate,
           child: const Text('Сохранить изменения'),
         ),
       ],
+    );
+  }
+
+  Widget _buildImagePicker() {
+    return GestureDetector(
+      onTap: widget.pickImage,
+      child: Container(
+        margin: const EdgeInsets.all(15.0),
+        width: 150,
+        height: 150,
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: Colors.grey, width: 2),
+        ),
+        child: widget.image == null
+            ? const Center(
+                child: Icon(
+                  Icons.person,
+                  size: 80,
+                ),
+              )
+            : ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Image.file(
+                  File(widget.image!.path),
+                  fit: BoxFit.cover,
+                  width: 150,
+                  height: 150,
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+      {required TextEditingController controller, required String label}) {
+    return TextField(
+      textCapitalization: TextCapitalization.words,
+      controller: controller,
+      decoration: InputDecoration(labelText: label),
+    );
+  }
+
+  Widget _buildDateField(
+      {required TextEditingController controller, required String label}) {
+    return TextField(
+      inputFormatters: [FormatterDate()],
+      controller: controller,
+      decoration: InputDecoration(labelText: label),
     );
   }
 }
