@@ -182,25 +182,29 @@ class AddingPersonViewState extends State<AddingPersonView> {
             PopupMenuButton<int>(
               icon: const Icon(Icons.filter_list),
               onSelected: widget.onFilterChanged,
-              itemBuilder: (context) => const [
-                PopupMenuItem(
+              itemBuilder: (context) => [
+                const PopupMenuItem(
                   value: 1,
                   child: Text("Сначала новый сотрудник"),
                 ),
-                PopupMenuItem(
+                const PopupMenuItem(
                   value: 2,
                   child: Text("Сначала старый сотрудник"),
                 ),
-                PopupMenuItem(
+                const PopupMenuItem(
                   value: 3,
                   child: Text("Сначала новая книжка"),
                 ),
-                PopupMenuItem(
+                const PopupMenuItem(
                   value: 4,
                   child: Text("Сначала старая книжка"),
                 ),
               ],
-            ),
+              color: Colors.white, // Устанавливает цвет фона для всех элементов
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15), // Закругление краев
+              ),
+            )
           ],
         ),
       ),
