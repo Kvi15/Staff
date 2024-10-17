@@ -133,7 +133,7 @@ class AddingPersonViewState extends State<AddingPersonView> {
   Widget _buildSearchAndFilterRow() {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 100, 0, 0),
+        padding: const EdgeInsets.fromLTRB(0, 75, 0, 0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -141,11 +141,36 @@ class AddingPersonViewState extends State<AddingPersonView> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 10),
-                  child: TextField(
-                    textCapitalization: TextCapitalization.words,
-                    controller: widget.searchController,
-                    focusNode: widget.searchFocusNode,
-                    decoration: _inputDecoration,
+                  child: SizedBox(
+                    height: 30, // Задаем высоту TextField
+                    child: TextField(
+                      textCapitalization: TextCapitalization.words,
+                      controller: widget.searchController,
+                      focusNode: widget.searchFocusNode,
+                      decoration: _inputDecoration.copyWith(
+                        isDense:
+                            true, // Уменьшаем плотность, чтобы уменьшить высоту
+
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 0,
+                            horizontal: 15), // Настройка отступов для текста
+                        enabledBorder: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                        focusedBorder: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: const Icon(
+                            Icons.clear,
+                            size: 15,
+                          ),
+                          onPressed: _clearSearch,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               )
@@ -180,6 +205,15 @@ class AddingPersonViewState extends State<AddingPersonView> {
         ),
       ),
     );
+  }
+
+  // Новый метод для очистки текста поиска
+  void _clearSearch() {
+    widget.searchController.clear(); // Очищаем текст в контроллере
+    widget.toggleSearch(); // Скрываем поле поиска
+    setState(() {
+      // Обновляем состояние, чтобы применить фильтрацию заново
+    });
   }
 
   Widget _buildUserList() {
