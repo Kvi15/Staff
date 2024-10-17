@@ -33,10 +33,10 @@ class ChangePersonListUI extends StatefulWidget {
   });
 
   @override
-  _ChangePersonListUIState createState() => _ChangePersonListUIState();
+  ChangePersonListUIState createState() => ChangePersonListUIState();
 }
 
-class _ChangePersonListUIState extends State<ChangePersonListUI> {
+class ChangePersonListUIState extends State<ChangePersonListUI> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(

@@ -56,7 +56,7 @@ class DayIndicatorPainter extends CustomPainter {
     // Рисуем отметки дней и текст с надписью количества дней
     const List<int> dayMarks = [14, 30, 60];
     const double circleRadius = 5;
-    final textStyle = TextStyle(color: Colors.black, fontSize: 12);
+    const textStyle = TextStyle(color: Colors.black, fontSize: 12);
 
     for (final dayMark in dayMarks) {
       final double x = (dayMark / totalDays) * size.width;

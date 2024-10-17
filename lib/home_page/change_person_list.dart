@@ -55,6 +55,7 @@ class ChangePersonListState extends State<ChangePersonList> {
   Future<void> _pickImage() async {
     try {
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      if (!mounted) return; // Проверяем, что виджет все еще монтирован
       setState(() {
         if (pickedFile != null) {
           _image = pickedFile;
@@ -62,9 +63,12 @@ class ChangePersonListState extends State<ChangePersonList> {
       });
     } catch (e) {
       // Обработка ошибок, если они возникли при выборе изображения
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка при выборе изображения: $e')),
-      );
+      if (mounted) {
+        // Проверяем, что виджет все еще монтирован
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка при выборе изображения: $e')),
+        );
+      }
     }
   }
 
@@ -88,12 +92,19 @@ class ChangePersonListState extends State<ChangePersonList> {
       await widget.user.save();
       await _rescheduleNotification(widget.user); // Перенос уведомления
       widget.onUpdate(); // Обновляем список
-      Navigator.of(context).pop(); // Закрываем диалог
+
+      if (mounted) {
+        Navigator.of(context)
+            .pop(); // Закрываем диалог, если виджет все еще монтирован
+      }
     } catch (e) {
       // Обработка ошибок при сохранении данных пользователя
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка при сохранении данных: $e')),
-      );
+      if (mounted) {
+        // Проверяем, что виджет все еще монтирован
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка при сохранении данных: $e')),
+        );
+      }
     }
   }
 

@@ -36,18 +36,31 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
       await notificationService
           .cancelNotification(user.key); // отменяем уведомление
       await userBox.delete(user.key); // удаляем пользователя
-      setState(() {
-        widget.users.remove(user);
-      });
+
+      // Проверяем, что виджет все еще монтирован перед обновлением состояния
+      if (mounted) {
+        setState(() {
+          widget.users.remove(user);
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Пользователь успешно удален.')),
+        );
+      }
     } catch (e) {
       // Обработка ошибок, если они возникли
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка при удалении пользователя: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка при удалении пользователя: $e')),
+        );
+      }
     }
   }
 
   Future<void> _editUser(User user) async {
+    // Проверяем, что виджет все еще монтирован перед вызовом диалога
+    if (!mounted) return;
+
     showChangePersonListDialog(context, user, _refreshUsers);
   }
 

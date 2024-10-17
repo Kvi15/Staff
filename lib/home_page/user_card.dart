@@ -1,12 +1,14 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_staff/home_page/day_Indicator.dart';
 import 'package:flutter_staff/home_page/user.dart';
+import 'package:flutter_staff/home_page/confirm_delete_dialog.dart'; // Импортируем новый диалог
 
 class UserCard extends StatelessWidget {
   final User user;
-  final Future<void> Function() onEdit; // Изменено на Future<void> Function()
-  final Future<void> Function() onDelete; // Изменено на Future<void> Function()
+  final Future<void> Function() onEdit;
+  final Future<void> Function() onDelete;
 
   const UserCard({
     super.key,
@@ -69,7 +71,7 @@ class UserCard extends StatelessWidget {
             right: 10,
             child: IconButton(
               onPressed: () async {
-                await onEdit(); // Изменено для ожидания результата
+                await onEdit();
               },
               icon: const Icon(Icons.more_vert, color: Colors.black),
             ),
@@ -78,7 +80,7 @@ class UserCard extends StatelessWidget {
             bottom: 7,
             right: 5,
             child: IconButton(
-              onPressed: () => _confirmDelete(context),
+              onPressed: () => showConfirmDeleteDialog(context, onDelete),
               icon: const Icon(Icons.delete, color: Colors.red),
             ),
           ),
@@ -130,31 +132,6 @@ class UserCard extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-
-  void _confirmDelete(BuildContext context) async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Удалить'),
-          content: const Text('Вы точно хотите удалить сотрудника?'),
-          actions: [
-            TextButton(
-              child: const Text('Нет'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: const Text('Да'),
-              onPressed: () async {
-                await onDelete(); // Изменено для ожидания результата
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }
