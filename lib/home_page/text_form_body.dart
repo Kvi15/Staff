@@ -1,4 +1,3 @@
-// ui/text_form_body.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_staff/home_page/formatter_date.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,8 +10,8 @@ class TextFormBody extends StatelessWidget {
   final TextEditingController numberController;
   final TextEditingController deviceDateController;
   final TextEditingController medicalBookController;
-  final Function() onPickImage;
-  final Function() onSave;
+  final Future<void> Function() onPickImage; // Изменено на Future<void>
+  final Future<void> Function() onSave; // Изменено на Future<void>
   final XFile? image;
 
   const TextFormBody({
@@ -56,7 +55,9 @@ class TextFormBody extends StatelessWidget {
               style: TextStyle(fontSize: 21, color: Colors.black),
             ),
             IconButton(
-              onPressed: onSave,
+              onPressed: () async {
+                await onSave(); // Вызов асинхронной функции
+              },
               icon: const Icon(Icons.save, size: 35),
             ),
           ],
@@ -73,7 +74,9 @@ class TextFormBody extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 GestureDetector(
-                  onTap: onPickImage,
+                  onTap: () async {
+                    await onPickImage(); // Вызов асинхронной функции
+                  },
                   child: Container(
                     margin: const EdgeInsets.all(15.0),
                     width: 150,

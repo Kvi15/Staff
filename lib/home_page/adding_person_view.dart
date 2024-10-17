@@ -211,8 +211,8 @@ class AddingPersonViewState extends State<AddingPersonView> {
     );
   }
 
-  // Новый метод для очистки текста поиска
-  void _clearSearch() {
+  // Новый метод для очистки текста поиска с асинхронной операцией
+  Future<void> _clearSearch() async {
     widget.searchController.clear(); // Очищаем текст в контроллере
     widget.toggleSearch(); // Скрываем поле поиска
     setState(() {
@@ -262,8 +262,9 @@ class AddingPersonViewState extends State<AddingPersonView> {
     );
   }
 
-  void _showAddUserForm() {
-    showModalBottomSheet<User>(
+  // Асинхронный метод для показа формы добавления пользователя
+  Future<void> _showAddUserForm() async {
+    final User? newUser = await showModalBottomSheet<User>(
       isScrollControlled: true,
       context: context,
       builder: (BuildContext context) {
@@ -281,5 +282,9 @@ class AddingPersonViewState extends State<AddingPersonView> {
         );
       },
     );
+
+    if (newUser != null) {
+      widget.addUser(newUser);
+    }
   }
 }

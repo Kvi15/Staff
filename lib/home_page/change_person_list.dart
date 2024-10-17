@@ -53,38 +53,48 @@ class ChangePersonListState extends State<ChangePersonList> {
   }
 
   Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-
-    setState(() {
-      if (pickedFile != null) {
-        _image = pickedFile;
-      }
-    });
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      setState(() {
+        if (pickedFile != null) {
+          _image = pickedFile;
+        }
+      });
+    } catch (e) {
+      // Обработка ошибок, если они возникли при выборе изображения
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка при выборе изображения: $e')),
+      );
+    }
   }
 
-  void _rescheduleNotification(User user) async {
+  Future<void> _rescheduleNotification(User user) async {
     final notificationService = NotificationService();
     await notificationService.cancelNotification(user.key);
   }
 
-  void updateUser() {
-    setState(() {
-      widget.user.surname = _surnameController.text;
-      widget.user.name = _nameController.text;
-      widget.user.patronymic = _patronymicController.text;
-      widget.user.number = _numberController.text;
-      widget.user.deviceDate = _deviceDateController.text;
-      widget.user.medicalBook = _medicalBookController.text;
-      widget.user.imagePath = _image?.path;
-    });
+  Future<void> updateUser() async {
+    // Обновляем данные пользователя
+    widget.user.surname = _surnameController.text;
+    widget.user.name = _nameController.text;
+    widget.user.patronymic = _patronymicController.text;
+    widget.user.number = _numberController.text;
+    widget.user.deviceDate = _deviceDateController.text;
+    widget.user.medicalBook = _medicalBookController.text;
+    widget.user.imagePath = _image?.path;
 
-    widget.user.save().then((_) {
-      if (mounted) {
-        _rescheduleNotification(widget.user);
-        widget.onUpdate();
-        Navigator.of(context).pop();
-      }
-    });
+    try {
+      // Асинхронное сохранение данных пользователя
+      await widget.user.save();
+      await _rescheduleNotification(widget.user); // Перенос уведомления
+      widget.onUpdate(); // Обновляем список
+      Navigator.of(context).pop(); // Закрываем диалог
+    } catch (e) {
+      // Обработка ошибок при сохранении данных пользователя
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка при сохранении данных: $e')),
+      );
+    }
   }
 
   @override

@@ -5,8 +5,8 @@ import 'package:flutter_staff/home_page/user.dart';
 
 class UserCard extends StatelessWidget {
   final User user;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
+  final Future<void> Function() onEdit; // Изменено на Future<void> Function()
+  final Future<void> Function() onDelete; // Изменено на Future<void> Function()
 
   const UserCard({
     super.key,
@@ -68,7 +68,9 @@ class UserCard extends StatelessWidget {
             top: 12,
             right: 10,
             child: IconButton(
-              onPressed: onEdit,
+              onPressed: () async {
+                await onEdit(); // Изменено для ожидания результата
+              },
               icon: const Icon(Icons.more_vert, color: Colors.black),
             ),
           ),
@@ -131,7 +133,7 @@ class UserCard extends StatelessWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context) {
+  void _confirmDelete(BuildContext context) async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -145,8 +147,8 @@ class UserCard extends StatelessWidget {
             ),
             TextButton(
               child: const Text('Да'),
-              onPressed: () {
-                onDelete();
+              onPressed: () async {
+                await onDelete(); // Изменено для ожидания результата
                 Navigator.of(context).pop();
               },
             ),

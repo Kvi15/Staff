@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 
 class TextForm extends StatefulWidget {
   final Function(User) onEmployeeAdded;
+
   const TextForm({super.key, required this.onEmployeeAdded});
 
   @override
@@ -46,7 +47,8 @@ class _TextFormState extends State<TextForm> {
     });
   }
 
-  void saveUser() async {
+  Future<void> saveUser() async {
+    // Изменено на Future<void>
     if (!mounted) return;
 
     final newUser = User(
@@ -86,7 +88,7 @@ class _TextFormState extends State<TextForm> {
       deviceDateController: _deviceDate,
       medicalBookController: _medicalBook,
       onPickImage: _pickImage,
-      onSave: saveUser,
+      onSave: saveUser, // Обновленная функция
       image: _image,
     );
   }

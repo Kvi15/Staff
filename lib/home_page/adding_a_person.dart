@@ -28,11 +28,21 @@ class _AddingAPersonState extends State<AddingAPerson> {
   void initState() {
     super.initState();
     userBox = widget.userBox;
-    _userCache = userBox.values.toList();
-    _filteredUsers = _userCache;
+    _loadInitialUsers();
     _searchController.addListener(_updateSearchState);
     _searchFocusNode.addListener(_handleFocusChange);
+  }
+
+  // Асинхронная загрузка пользователей
+  Future<void> _loadInitialUsers() async {
+    _userCache = await _getUsers();
+    _filteredUsers = _userCache;
     _sortUsers();
+  }
+
+  Future<List<User>> _getUsers() async {
+    // Возвращаем список пользователей из базы данных
+    return userBox.values.toList();
   }
 
   void _sortUsers() {
@@ -40,30 +50,10 @@ class _AddingAPersonState extends State<AddingAPerson> {
       _filteredUsers.sort((a, b) {
         DateTime deviceDateA, deviceDateB, medicalDateA, medicalDateB;
 
-        try {
-          deviceDateA = DateFormat('dd.MM.yyyy').parse(a.deviceDate);
-        } catch (e) {
-          deviceDateA =
-              DateTime(0); // Значение по умолчанию, если парсинг не удался
-        }
-
-        try {
-          deviceDateB = DateFormat('dd.MM.yyyy').parse(b.deviceDate);
-        } catch (e) {
-          deviceDateB = DateTime(0);
-        }
-
-        try {
-          medicalDateA = DateFormat('dd.MM.yyyy').parse(a.medicalBook);
-        } catch (e) {
-          medicalDateA = DateTime(0);
-        }
-
-        try {
-          medicalDateB = DateFormat('dd.MM.yyyy').parse(b.medicalBook);
-        } catch (e) {
-          medicalDateB = DateTime(0);
-        }
+        deviceDateA = _parseDate(a.deviceDate);
+        deviceDateB = _parseDate(b.deviceDate);
+        medicalDateA = _parseDate(a.medicalBook);
+        medicalDateB = _parseDate(b.medicalBook);
 
         switch (_selectedFilter) {
           case 1: // По дате устройства от большего к меньшему
@@ -81,17 +71,29 @@ class _AddingAPersonState extends State<AddingAPerson> {
     });
   }
 
-  void _addUser(User user) {
+  DateTime _parseDate(String dateString) {
+    try {
+      return DateFormat('dd.MM.yyyy').parse(dateString);
+    } catch (e) {
+      return DateTime(0); // Значение по умолчанию, если парсинг не удался
+    }
+  }
+
+  Future<void> _addUser(User user) async {
     setState(() {
       if (user.isInBox) {
         user.save();
       } else {
         userBox.add(user);
       }
-      _userCache = userBox.values.toList(); // Обновляем кэш
-      _filteredUsers = _userCache; // Применяем изменения в одном вызове
+      _updateUserCache(); // Обновляем кэш
       _sortUsers(); // Сортировка после добавления
     });
+  }
+
+  Future<void> _updateUserCache() async {
+    _userCache = await _getUsers(); // Обновляем кэш асинхронно
+    _filteredUsers = _userCache; // Применяем изменения в одном вызове
   }
 
   void _onFilterChanged(int filterOption) {
@@ -113,7 +115,6 @@ class _AddingAPersonState extends State<AddingAPerson> {
     if (_filteredUsers != newFilteredUsers) {
       setState(() {
         _filteredUsers = newFilteredUsers;
-        // Не сортируйте здесь, вызывайте сортировку только в фильтре или добавлении
       });
     }
   }

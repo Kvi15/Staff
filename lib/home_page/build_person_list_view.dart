@@ -28,23 +28,30 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
     userBox = Hive.box<User>('users');
   }
 
-  void _deleteUser(User user) async {
+  Future<void> _deleteUser(User user) async {
     // Отменяем уведомления перед удалением пользователя
     final notificationService = NotificationService();
-    await notificationService
-        .cancelNotification(user.key); // отменяем уведомление
 
-    await userBox.delete(user.key); // удаляем пользователя
-    setState(() {
-      widget.users.remove(user);
-    });
+    try {
+      await notificationService
+          .cancelNotification(user.key); // отменяем уведомление
+      await userBox.delete(user.key); // удаляем пользователя
+      setState(() {
+        widget.users.remove(user);
+      });
+    } catch (e) {
+      // Обработка ошибок, если они возникли
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка при удалении пользователя: $e')),
+      );
+    }
   }
 
-  void _editUser(User user) {
+  Future<void> _editUser(User user) async {
     showChangePersonListDialog(context, user, _refreshUsers);
   }
 
-  void _refreshUsers() {
+  Future<void> _refreshUsers() async {
     setState(() {
       widget.users.sort((a, b) => a.surname.compareTo(b.surname));
     });
