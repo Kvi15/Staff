@@ -32,26 +32,23 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
     final notificationService = NotificationService();
 
     try {
-      // Отмена уведомлений
-      for (int id in user.notificationIds) {
-        await notificationService.cancelNotification(id);
+      // Отменяем все запланированные уведомления, привязанные к этому пользователю
+      for (int notificationId in user.notificationIds) {
+        await notificationService.cancelNotification(notificationId);
       }
 
-      await userBox.delete(user.key); // Удаление пользователя
+      // Удаляем пользователя из Hive
+      await userBox.delete(user.key); // Удаление пользователя по ключу
 
       if (mounted) {
         setState(() {
-          widget.users.remove(user);
+          widget.users.remove(user); // Удаляем пользователя из списка в UI
         });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Пользователь успешно удален.')),
-        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка при удалении пользователя: $e')),
+          SnackBar(content: Text('Ошибка при удалении: $e')),
         );
       }
     }

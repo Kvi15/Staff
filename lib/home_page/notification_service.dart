@@ -1,8 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_staff/home_page/user.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -19,7 +20,8 @@ class NotificationService {
   Future<void> init() async {
     // Инициализация Timezone
     tz.initializeTimeZones();
-    tz.setLocalLocation(tz.local);
+    tz.setLocalLocation(tz.getLocation(
+        'Europe/Moscow')); // Устанавливаем временную зону по умолчанию
 
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@drawable/my_custom_icon');
@@ -56,20 +58,14 @@ class NotificationService {
     );
   }
 
+  // Метод для планирования уведомлений с учетом временной зоны
   Future<void> scheduleNotification(DateTime scheduledDate, User user,
       String message, int notificationId) async {
-    // Создаем TZDateTime из scheduledDate и устанавливаем время на 8:00 AM
+    // Планируем уведомление на 8:00 по времени устройства
     final tz.TZDateTime scheduledTime = tz.TZDateTime.from(
-      tz.TZDateTime.now(tz.local).copyWith(
-        year: scheduledDate.year,
-        month: scheduledDate.month,
-        day: scheduledDate.day,
-        hour: 8, // Время уведомления (8:00 AM по локальному времени)
-        minute: 0,
-        second: 0,
-        microsecond: 0,
-      ),
-      tz.local,
+      DateTime(scheduledDate.year, scheduledDate.month, scheduledDate.day,
+          8), // Время уведомления (8:00)
+      tz.local, // Локальная временная зона
     );
 
     try {
@@ -83,8 +79,10 @@ class NotificationService {
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
       );
+
+      // Для отладки выводим дату и время уведомления с учетом временной зоны
       debugPrint(
-          'Запланировано уведомление с ID $notificationId на ${scheduledTime.toIso8601String()}');
+          'Запланировано уведомление с ID $notificationId на ${DateFormat('dd.MM.yyyy HH:mm').format(scheduledTime)}');
     } catch (e) {
       debugPrint('Ошибка создания уведомлений: $e');
     }
