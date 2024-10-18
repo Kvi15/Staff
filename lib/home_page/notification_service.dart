@@ -58,12 +58,18 @@ class NotificationService {
 
   Future<void> scheduleNotification(DateTime scheduledDate, User user,
       String message, int notificationId) async {
-    // Создание TZDateTime с учетом временной зоны UTC
-    final tz.TZDateTime scheduledTime = tz.TZDateTime.utc(
-      scheduledDate.year,
-      scheduledDate.month,
-      scheduledDate.day,
-      8, // Время уведомления (8:00 AM по UTC)
+    // Создаем TZDateTime из scheduledDate и устанавливаем время на 8:00 AM
+    final tz.TZDateTime scheduledTime = tz.TZDateTime.from(
+      tz.TZDateTime.now(tz.local).copyWith(
+        year: scheduledDate.year,
+        month: scheduledDate.month,
+        day: scheduledDate.day,
+        hour: 8, // Время уведомления (8:00 AM по локальному времени)
+        minute: 0,
+        second: 0,
+        microsecond: 0,
+      ),
+      tz.local,
     );
 
     try {
@@ -78,7 +84,7 @@ class NotificationService {
             UILocalNotificationDateInterpretation.absoluteTime,
       );
       debugPrint(
-          'Запланировано уведомление с ID $notificationId на ${scheduledDate.toIso8601String()}');
+          'Запланировано уведомление с ID $notificationId на ${scheduledTime.toIso8601String()}');
     } catch (e) {
       debugPrint('Ошибка создания уведомлений: $e');
     }
