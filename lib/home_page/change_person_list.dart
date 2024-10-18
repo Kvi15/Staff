@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staff/home_page/notification_helper.dart';
 import 'package:flutter_staff/home_page/notification_service.dart';
 import 'package:flutter_staff/home_page/user.dart';
 import 'package:image_picker/image_picker.dart';
@@ -72,7 +73,7 @@ class ChangePersonListState extends State<ChangePersonList> {
     }
   }
 
-  Future<void> _rescheduleNotification(User user) async {
+  Future<void> rescheduleNotification(User user) async {
     final notificationService = NotificationService();
     await notificationService.cancelNotification(user.key);
   }
@@ -88,21 +89,30 @@ class ChangePersonListState extends State<ChangePersonList> {
     widget.user.imagePath = _image?.path;
 
     try {
-      // Асинхронное сохранение данных пользователя
+      // Отменяем старые уведомления
+      for (int notificationId in widget.user.notificationIds) {
+        await NotificationService().cancelNotification(notificationId);
+      }
+
+      // Очищаем старые идентификаторы
+      widget.user.notificationIds.clear();
+
+      // Планируем новые уведомления
+      await NotificationHelper.scheduleNotificationsForUser(widget.user);
+
+      // Сохраняем обновленные данные пользователя и новые уведомления
       await widget.user.save();
-      await _rescheduleNotification(widget.user); // Перенос уведомления
-      widget.onUpdate(); // Обновляем список
+
+      widget.onUpdate(); // Обновляем список пользователей
 
       if (mounted) {
         Navigator.of(context)
             .pop(); // Закрываем диалог, если виджет все еще монтирован
       }
     } catch (e) {
-      // Обработка ошибок при сохранении данных пользователя
       if (mounted) {
-        // Проверяем, что виджет все еще монтирован
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка при сохранении данных: $e')),
+          SnackBar(content: Text('Ошибка при обновлении данных: $e')),
         );
       }
     }

@@ -25,6 +25,10 @@ class User extends HiveObject {
   @HiveField(6)
   String medicalBook;
 
+  // Новое поле для идентификатора уведомления
+  @HiveField(7)
+  List<int> notificationIds; // Список идентификаторов уведомлений
+
   User({
     this.surname = 'Фамилия',
     this.name = 'Имя',
@@ -33,5 +37,6 @@ class User extends HiveObject {
     this.imagePath,
     this.deviceDate = '01.01.2020',
     this.medicalBook = 'Медкнижка',
-  });
+    List<int>? notificationIds, // Добавьте параметр в конструктор
+  }) : notificationIds = notificationIds ?? [];
 }

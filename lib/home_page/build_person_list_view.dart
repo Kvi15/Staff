@@ -29,15 +29,16 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
   }
 
   Future<void> _deleteUser(User user) async {
-    // Отменяем уведомления перед удалением пользователя
     final notificationService = NotificationService();
 
     try {
-      await notificationService
-          .cancelNotification(user.key); // отменяем уведомление
-      await userBox.delete(user.key); // удаляем пользователя
+      // Отмена уведомлений
+      for (int id in user.notificationIds) {
+        await notificationService.cancelNotification(id);
+      }
 
-      // Проверяем, что виджет все еще монтирован перед обновлением состояния
+      await userBox.delete(user.key); // Удаление пользователя
+
       if (mounted) {
         setState(() {
           widget.users.remove(user);
@@ -48,7 +49,6 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
         );
       }
     } catch (e) {
-      // Обработка ошибок, если они возникли
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Ошибка при удалении пользователя: $e')),

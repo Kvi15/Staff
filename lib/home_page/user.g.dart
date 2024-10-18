@@ -17,13 +17,13 @@ class UserAdapter extends TypeAdapter<User> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return User(
-      surname: fields[0] as String? ?? 'Фамилия',
-      name: fields[1] as String? ?? 'Имя',
-      patronymic: fields[2] as String? ?? 'Отчество',
-      number: fields[3] as String? ?? 'Номер',
+      surname: fields[0] as String,
+      name: fields[1] as String,
+      patronymic: fields[2] as String,
+      number: fields[3] as String,
       imagePath: fields[4] as String?,
-      deviceDate: fields[5] as String? ?? '01.01.2020',
-      medicalBook: fields[6] as String? ?? 'Медкнижка',
+      deviceDate: fields[5] as String,
+      medicalBook: fields[6] as String,
     );
   }
 
@@ -46,4 +46,14 @@ class UserAdapter extends TypeAdapter<User> {
       ..writeByte(6)
       ..write(obj.medicalBook);
   }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UserAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
 }

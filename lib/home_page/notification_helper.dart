@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_staff/home_page/notification_service.dart';
 import 'package:flutter_staff/home_page/user.dart';
+import 'package:intl/intl.dart';
 
 class NotificationHelper {
   static Future<void> scheduleNotificationsForUser(User user) async {
@@ -32,6 +32,9 @@ class NotificationHelper {
           // Генерация уникального идентификатора для каждого уведомления
           int notificationId = user.key.hashCode + i;
 
+          // Сохранение идентификатора уведомления в списке
+          user.notificationIds.add(notificationId);
+
           // Планирование уведомления с уникальным идентификатором
           await notificationService.scheduleNotification(
             scheduledDate,
@@ -44,6 +47,9 @@ class NotificationHelper {
           debugPrint(
               "Запланировано уведомление на ${dateFormat.format(scheduledDate)}: ${notification["message"]} с ID $notificationId");
         }
+
+        // Сохраните изменения в Hive
+        await user.save();
       } catch (e) {
         debugPrint('Ошибка при планировании уведомлений: $e');
       }
