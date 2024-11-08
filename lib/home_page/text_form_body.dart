@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staff/bloc/user_bloc.dart';
+import 'package:flutter_staff/bloc/user_event.dart';
 import 'package:flutter_staff/home_page/formatter_date.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -55,8 +58,19 @@ class TextFormBody extends StatelessWidget {
               style: TextStyle(fontSize: 21, color: Colors.black),
             ),
             IconButton(
-              onPressed: () async {
-                await onSave(); // Вызов асинхронной функции
+              onPressed: () {
+                context.read<UserBloc>().add(
+                      SaveUserEvent(
+                        surname: surnameController.text,
+                        name: nameController.text,
+                        patronymic: patronymicController.text,
+                        number: numberController.text,
+                        deviceDate: deviceDateController.text,
+                        medicalBook: medicalBookController.text,
+                        imagePath: image?.path,
+                      ),
+                    );
+                Navigator.of(context).pop();
               },
               icon: const Icon(Icons.save, size: 35),
             ),

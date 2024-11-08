@@ -8,11 +8,15 @@ import 'package:hive_flutter/hive_flutter.dart';
 class BuildPersonListView extends StatefulWidget {
   final double scrollOffset;
   final List<User> users;
+  final void Function(User) onDelete; // Добавлен параметр onDelete
+  final VoidCallback onRefresh; // Параметр для обновления списка
 
   const BuildPersonListView({
     super.key,
     this.scrollOffset = 0.0,
     required this.users,
+    required this.onDelete,
+    required this.onRefresh,
   });
 
   @override
@@ -41,9 +45,8 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
       await userBox.delete(user.key); // Удаление пользователя по ключу
 
       if (mounted) {
-        setState(() {
-          widget.users.remove(user); // Удаляем пользователя из списка в UI
-        });
+        widget.onDelete(user); // Вызов внешнего обработчика удаления
+        widget.onRefresh(); // Обновление списка после удаления
       }
     } catch (e) {
       if (mounted) {
@@ -55,7 +58,6 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
   }
 
   Future<void> _editUser(User user) async {
-    // Проверяем, что виджет все еще монтирован перед вызовом диалога
     if (!mounted) return;
 
     showChangePersonListDialog(context, user, _refreshUsers);
@@ -65,6 +67,7 @@ class _BuildPersonListViewState extends State<BuildPersonListView> {
     setState(() {
       widget.users.sort((a, b) => a.surname.compareTo(b.surname));
     });
+    widget.onRefresh(); // Вызов внешнего обновления
   }
 
   @override

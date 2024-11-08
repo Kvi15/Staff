@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staff/bloc/user_bloc.dart';
+import 'package:flutter_staff/bloc/user_event.dart';
+import 'package:flutter_staff/home_page/user.dart';
 
-Future<void> showConfirmDeleteDialog(
-  BuildContext context,
-  Future<void> Function() onDelete,
-) async {
-  // Открытие диалога
+Future<void> showConfirmDeleteDialog(BuildContext context, User user) async {
   final shouldDelete = await showDialog<bool>(
     context: context,
     builder: (BuildContext dialogContext) {
@@ -17,7 +17,11 @@ Future<void> showConfirmDeleteDialog(
             child: const Text('Нет'),
           ),
           TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
+            onPressed: () {
+              // Отправляем событие удаления через Bloc
+              context.read<UserBloc>().add(DeleteUser(user));
+              Navigator.of(dialogContext).pop(true);
+            },
             child: const Text('Да'),
           ),
         ],
@@ -25,8 +29,9 @@ Future<void> showConfirmDeleteDialog(
     },
   );
 
-  // Выполнение onDelete только если пользователь подтвердил удаление
   if (shouldDelete == true) {
-    await onDelete();
+    context
+        .read<UserBloc>()
+        .add(LoadUsers()); // Обновляем список после удаления
   }
 }

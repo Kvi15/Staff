@@ -80,10 +80,10 @@ class UserCard extends StatelessWidget {
             bottom: 7,
             right: 5,
             child: IconButton(
-              onPressed: () => showConfirmDeleteDialog(context, onDelete),
+              onPressed: () => showConfirmDeleteDialog(context, user),
               icon: const Icon(Icons.delete, color: Colors.red),
             ),
-          ),
+          )
         ],
       ),
     );

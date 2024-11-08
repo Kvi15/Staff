@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staff/bloc/user_bloc.dart';
+import 'package:flutter_staff/bloc/user_state.dart';
 import 'package:flutter_staff/home_page/build_person_list_view.dart';
+import 'package:flutter_staff/home_page/confirm_delete_dialog.dart';
 import 'package:flutter_staff/home_page/text_form.dart';
 import 'package:flutter_staff/home_page/user.dart';
 
 class AddingPersonView extends StatefulWidget {
-  final List<User> filteredUsers;
   final bool isSearching;
   final TextEditingController searchController;
   final FocusNode searchFocusNode;
@@ -14,13 +17,13 @@ class AddingPersonView extends StatefulWidget {
 
   const AddingPersonView({
     super.key,
-    required this.filteredUsers,
     required this.isSearching,
     required this.searchController,
     required this.searchFocusNode,
     required this.toggleSearch,
     required this.addUser,
     required this.onFilterChanged,
+    required List<User> filteredUsers,
   });
 
   @override
@@ -142,18 +145,15 @@ class AddingPersonViewState extends State<AddingPersonView> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 10),
                   child: SizedBox(
-                    height: 30, // Задаем высоту TextField
+                    height: 30,
                     child: TextField(
                       textCapitalization: TextCapitalization.words,
                       controller: widget.searchController,
                       focusNode: widget.searchFocusNode,
                       decoration: _inputDecoration.copyWith(
-                        isDense:
-                            true, // Уменьшаем плотность, чтобы уменьшить высоту
-
+                        isDense: true,
                         contentPadding: const EdgeInsets.symmetric(
-                            vertical: 0,
-                            horizontal: 15), // Настройка отступов для текста
+                            vertical: 0, horizontal: 15),
                         enabledBorder: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(30)),
                           borderSide: BorderSide(color: Colors.black),
@@ -200,9 +200,9 @@ class AddingPersonViewState extends State<AddingPersonView> {
                   child: Text("Сначала старая книжка"),
                 ),
               ],
-              color: Colors.white, // Устанавливает цвет фона для всех элементов
+              color: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15), // Закругление краев
+                borderRadius: BorderRadius.circular(15),
               ),
             )
           ],
@@ -211,18 +211,34 @@ class AddingPersonViewState extends State<AddingPersonView> {
     );
   }
 
-  // Новый метод для очистки текста поиска с асинхронной операцией
   Future<void> _clearSearch() async {
-    widget.searchController.clear(); // Очищаем текст в контроллере
-    widget.toggleSearch(); // Скрываем поле поиска
-    setState(() {
-      // Обновляем состояние, чтобы применить фильтрацию заново
-    });
+    widget.searchController.clear();
+    widget.toggleSearch();
+    setState(() {});
   }
 
   Widget _buildUserList() {
-    return BuildPersonListView(
-      users: widget.filteredUsers,
+    return BlocBuilder<UserBloc, UserState>(
+      builder: (context, state) {
+        if (state is UsersLoading) {
+          return const SliverToBoxAdapter(
+            child: Center(child: CircularProgressIndicator()),
+          );
+        } else if (state is UsersLoaded) {
+          return BuildPersonListView(
+            users: state.users,
+            onDelete: (user) => showConfirmDeleteDialog(context, user),
+            onRefresh: () {},
+          );
+        } else if (state is UserError) {
+          return SliverToBoxAdapter(
+            child: Center(child: Text(state.message)),
+          );
+        }
+        return const SliverToBoxAdapter(
+          child: Center(child: Text("Не удалось загрузить пользователей")),
+        );
+      },
     );
   }
 
@@ -262,7 +278,6 @@ class AddingPersonViewState extends State<AddingPersonView> {
     );
   }
 
-  // Асинхронный метод для показа формы добавления пользователя
   Future<void> _showAddUserForm() async {
     final User? newUser = await showModalBottomSheet<User>(
       isScrollControlled: true,

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Для работы с SystemChrome
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staff/bloc/user_bloc.dart';
+import 'package:flutter_staff/bloc/user_event.dart';
 import 'package:flutter_staff/home_page/notification_service.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_staff/home_page/adding_a_person.dart';
@@ -25,14 +28,16 @@ void main() async {
   // Инициализация локализации для работы с датами на русском
   await initializeDateFormatting('ru', null);
 
-  // Запускаем приложение и передаем userBox в MyApp
-  runApp(MyApp(userBox: userBox));
+  // Запускаем приложение и передаем userBox и notificationService в MyApp
+  runApp(MyApp(userBox: userBox, notificationService: notificationService));
 }
 
 class MyApp extends StatelessWidget {
   final Box<User> userBox;
+  final NotificationService notificationService;
 
-  const MyApp({super.key, required this.userBox});
+  const MyApp(
+      {super.key, required this.userBox, required this.notificationService});
 
   @override
   Widget build(BuildContext context) {
@@ -43,16 +48,24 @@ class MyApp extends StatelessWidget {
       statusBarBrightness: Brightness.light, // Яркость для iOS
     ));
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.transparent, // Прозрачный AppBar
-          elevation: 0,
-          systemOverlayStyle: SystemUiOverlayStyle.dark, // Тёмные иконки
+    return BlocProvider(
+      create: (context) {
+        final userBloc = UserBloc(
+            userBox: userBox, notificationService: notificationService);
+        userBloc.add(LoadUsers()); // Добавляем событие загрузки пользователей
+        return userBloc;
+      },
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.transparent, // Прозрачный AppBar
+            elevation: 0,
+            systemOverlayStyle: SystemUiOverlayStyle.dark, // Тёмные иконки
+          ),
         ),
+        home: AddingAPerson(userBox: userBox),
       ),
-      home: AddingAPerson(userBox: userBox),
     );
   }
 }
