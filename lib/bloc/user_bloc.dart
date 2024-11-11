@@ -5,6 +5,7 @@ import 'package:flutter_staff/home_page/notification_helper.dart';
 import 'package:flutter_staff/home_page/notification_service.dart';
 import 'package:flutter_staff/home_page/user.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart'; // Импортируем пакет для работы с датами
 import 'user_event.dart';
 import 'user_state.dart';
 
@@ -78,27 +79,50 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   }
 
   void _onSortUsers(SortUsersEvent event, Emitter<UserState> emit) {
+    final DateFormat inputFormat =
+        DateFormat('dd.MM.yyyy'); // Формат даты, как в вашей строке
     final users = userBox.values.toList();
+
     users.sort((a, b) {
       DateTime deviceDateA, deviceDateB, medicalDateA, medicalDateB;
-      deviceDateA = DateTime.parse(a.deviceDate);
-      deviceDateB = DateTime.parse(b.deviceDate);
-      medicalDateA = DateTime.parse(a.medicalBook);
-      medicalDateB = DateTime.parse(b.medicalBook);
+
+      try {
+        deviceDateA =
+            inputFormat.parse(a.deviceDate); // Преобразуем строку в DateTime
+        deviceDateB =
+            inputFormat.parse(b.deviceDate); // Преобразуем строку в DateTime
+        medicalDateA =
+            inputFormat.parse(a.medicalBook); // Преобразуем строку в DateTime
+        medicalDateB =
+            inputFormat.parse(b.medicalBook); // Преобразуем строку в DateTime
+      } catch (e) {
+        emit(UserError('Ошибка парсинга даты: $e'));
+        return 0;
+      }
 
       switch (event.filterOption) {
         case 1:
-          return deviceDateB.compareTo(deviceDateA);
+          return deviceDateB.compareTo(
+              deviceDateA); // Сортировка по дате устройства от большего к меньшему
         case 2:
-          return deviceDateA.compareTo(deviceDateB);
+          return deviceDateA.compareTo(
+              deviceDateB); // Сортировка по дате устройства от меньшего к большему
         case 3:
-          return medicalDateB.compareTo(medicalDateA);
+          return medicalDateB.compareTo(
+              medicalDateA); // Сортировка по дате мед книжки от большего к меньшему
         case 4:
-          return medicalDateA.compareTo(medicalDateB);
+          return medicalDateA.compareTo(
+              medicalDateB); // Сортировка по дате мед книжки от меньшего к большему
         default:
           return 0;
       }
     });
-    emit(UsersLoaded(users));
+
+    // Обновляем Box с отсортированными пользователями, используя их оригинальные ключи
+    for (var user in users) {
+      userBox.put(user.key, user); // Используем ключ для сохранения объектов
+    }
+
+    emit(UsersLoaded(users)); // Отправляем обновленный список
   }
 }

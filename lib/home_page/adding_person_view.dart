@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staff/bloc/user_bloc.dart';
+import 'package:flutter_staff/bloc/user_event.dart';
 import 'package:flutter_staff/bloc/user_state.dart';
 import 'package:flutter_staff/home_page/build_person_list_view.dart';
 import 'package:flutter_staff/home_page/confirm_delete_dialog.dart';
@@ -13,7 +14,6 @@ class AddingPersonView extends StatefulWidget {
   final FocusNode searchFocusNode;
   final VoidCallback toggleSearch;
   final void Function(User) addUser;
-  final Function(int) onFilterChanged;
 
   const AddingPersonView({
     super.key,
@@ -22,8 +22,6 @@ class AddingPersonView extends StatefulWidget {
     required this.searchFocusNode,
     required this.toggleSearch,
     required this.addUser,
-    required this.onFilterChanged,
-    required List<User> filteredUsers,
   });
 
   @override
@@ -50,6 +48,24 @@ class AddingPersonViewState extends State<AddingPersonView> {
       size: 20,
     ),
   );
+
+  void _onSearchChanged() {
+    context
+        .read<UserBloc>()
+        .add(SearchUsersEvent(widget.searchController.text));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.searchController.removeListener(_onSearchChanged);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -181,7 +197,7 @@ class AddingPersonViewState extends State<AddingPersonView> {
               ),
             PopupMenuButton<int>(
               icon: const Icon(Icons.filter_list),
-              onSelected: widget.onFilterChanged,
+              onSelected: _onFilterChanged,
               itemBuilder: (context) => [
                 const PopupMenuItem(
                   value: 1,
@@ -204,7 +220,7 @@ class AddingPersonViewState extends State<AddingPersonView> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -301,5 +317,10 @@ class AddingPersonViewState extends State<AddingPersonView> {
     if (newUser != null) {
       widget.addUser(newUser);
     }
+  }
+
+  // Обработчик выбора фильтра
+  void _onFilterChanged(int value) {
+    context.read<UserBloc>().add(SortUsersEvent(value));
   }
 }

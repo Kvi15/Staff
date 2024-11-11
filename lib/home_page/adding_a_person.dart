@@ -3,7 +3,6 @@ import 'package:flutter_staff/home_page/adding_person_view.dart';
 import 'package:flutter_staff/home_page/search_utils.dart';
 import 'package:flutter_staff/home_page/user.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:intl/intl.dart';
 
 class AddingAPerson extends StatefulWidget {
   final Box<User> userBox;
@@ -21,8 +20,6 @@ class _AddingAPersonState extends State<AddingAPerson> {
   final FocusNode _searchFocusNode = FocusNode();
   bool _isSearching = false;
   List<User> _filteredUsers = [];
-  int _selectedFilter =
-      1; // По умолчанию, сортировка по дате устройства от большего к меньшему
 
   @override
   void initState() {
@@ -37,46 +34,11 @@ class _AddingAPersonState extends State<AddingAPerson> {
   Future<void> _loadInitialUsers() async {
     _userCache = await _getUsers();
     _filteredUsers = _userCache;
-    _sortUsers();
   }
 
   Future<List<User>> _getUsers() async {
     // Возвращаем список пользователей из базы данных
     return userBox.values.toList();
-  }
-
-  void _sortUsers() {
-    setState(() {
-      _filteredUsers.sort((a, b) {
-        DateTime deviceDateA, deviceDateB, medicalDateA, medicalDateB;
-
-        deviceDateA = _parseDate(a.deviceDate);
-        deviceDateB = _parseDate(b.deviceDate);
-        medicalDateA = _parseDate(a.medicalBook);
-        medicalDateB = _parseDate(b.medicalBook);
-
-        switch (_selectedFilter) {
-          case 1: // По дате устройства от большего к меньшему
-            return deviceDateB.compareTo(deviceDateA);
-          case 2: // По дате устройства от меньшего к большему
-            return deviceDateA.compareTo(deviceDateB);
-          case 3: // По дате мед книжки от большего к меньшему
-            return medicalDateB.compareTo(medicalDateA);
-          case 4: // По дате мед книжки от меньшего к большему
-            return medicalDateA.compareTo(medicalDateB);
-          default:
-            return 0;
-        }
-      });
-    });
-  }
-
-  DateTime _parseDate(String dateString) {
-    try {
-      return DateFormat('dd.MM.yyyy').parse(dateString);
-    } catch (e) {
-      return DateTime(0); // Значение по умолчанию, если парсинг не удался
-    }
   }
 
   Future<void> _addUser(User user) async {
@@ -87,20 +49,12 @@ class _AddingAPersonState extends State<AddingAPerson> {
         userBox.add(user);
       }
       _updateUserCache(); // Обновляем кэш
-      _sortUsers(); // Сортировка после добавления
     });
   }
 
   Future<void> _updateUserCache() async {
     _userCache = await _getUsers(); // Обновляем кэш асинхронно
     _filteredUsers = _userCache; // Применяем изменения в одном вызове
-  }
-
-  void _onFilterChanged(int filterOption) {
-    setState(() {
-      _selectedFilter = filterOption;
-      _sortUsers();
-    });
   }
 
   void _toggleSearch() {
@@ -136,13 +90,11 @@ class _AddingAPersonState extends State<AddingAPerson> {
   @override
   Widget build(BuildContext context) {
     return AddingPersonView(
-      filteredUsers: _filteredUsers,
       isSearching: _isSearching,
       searchController: _searchController,
       searchFocusNode: _searchFocusNode,
       toggleSearch: _toggleSearch,
       addUser: _addUser,
-      onFilterChanged: _onFilterChanged,
     );
   }
 }
