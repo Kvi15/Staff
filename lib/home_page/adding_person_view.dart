@@ -71,13 +71,15 @@ class AddingPersonViewState extends State<AddingPersonView> {
   Widget build(BuildContext context) {
     return BlocListener<UserBloc, UserState>(
       listener: (context, state) {
-        if (state is ShowInfoDialogState) {
+        if (state is UsersLoaded && state.dialogIsOpen) {
           showDialog(
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: const Text('Связь с разработчиком',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                title: const Text(
+                  'Связь с разработчиком',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 content: const Text(
                   'Обратитесь по адресу putslizox@gmail.com',
                   style: TextStyle(fontSize: 16),
@@ -87,17 +89,13 @@ class AddingPersonViewState extends State<AddingPersonView> {
                     child: const Text('Закрыть'),
                     onPressed: () {
                       Navigator.of(context).pop();
-                      context
-                          .read<UserBloc>()
-                          .add(LoadUsers()); // Возвращаем обычное состояние
+                      context.read<UserBloc>().add(HideInfoDialogEvent());
                     },
                   ),
                 ],
               );
             },
           );
-        } else if (state is HideInfoDialogState) {
-          Navigator.of(context).pop(); // Закрываем диалог
         }
       },
       child: GestureDetector(
