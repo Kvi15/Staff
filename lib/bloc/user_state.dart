@@ -1,5 +1,3 @@
-// bloc/user_state.dart
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter_staff/home_page/user.dart';
 
@@ -21,16 +19,23 @@ class UsersLoading extends UserState {}
 
 class UsersLoaded extends UserState {
   final List<User> users;
+  final bool dialogIsOpen;
 
-  const UsersLoaded(this.users);
+  const UsersLoaded(this.users, {this.dialogIsOpen = false});
+
+  UsersLoaded copyWith({List<User>? users, bool? dialogIsOpen}) {
+    return UsersLoaded(
+      users ?? this.users,
+      dialogIsOpen: dialogIsOpen ?? this.dialogIsOpen,
+    );
+  }
 
   @override
-  List<Object> get props => [users];
+  List<Object> get props => [users, dialogIsOpen];
 }
 
 class UserError extends UserState {
   final String message;
-
   const UserError(this.message);
 
   @override
@@ -39,9 +44,12 @@ class UserError extends UserState {
 
 class ImagePicked extends UserState {
   final String imagePath;
-
   const ImagePicked(this.imagePath);
 
   @override
   List<Object> get props => [imagePath];
 }
+
+class ShowInfoDialogState extends UserState {}
+
+class HideInfoDialogState extends UserState {}

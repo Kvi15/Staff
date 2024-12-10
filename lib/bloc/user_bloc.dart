@@ -1,11 +1,9 @@
-// user_bloc.dart
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staff/home_page/notification_helper.dart';
 import 'package:flutter_staff/home_page/notification_service.dart';
 import 'package:flutter_staff/home_page/user.dart';
 import 'package:hive/hive.dart';
-import 'package:intl/intl.dart'; // Импортируем пакет для работы с датами
+import 'package:intl/intl.dart';
 import 'user_event.dart';
 import 'user_state.dart';
 
@@ -18,14 +16,16 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<LoadUsers>(_onLoadUsers);
     on<SaveUserEvent>(_onSaveUser);
     on<DeleteUser>(_onDeleteUser);
-    on<SearchUsersEvent>(_onSearchUsers); // Добавлено событие поиска
-    on<SortUsersEvent>(_onSortUsers); // Добавлено событие сортировки
+    on<SearchUsersEvent>(_onSearchUsers);
+    on<SortUsersEvent>(_onSortUsers);
+    on<ShowInfoDialogEvent>(_onShowInfoDialog);
+    on<HideInfoDialogEvent>(_onHideInfoDialog);
   }
 
   void _onLoadUsers(LoadUsers event, Emitter<UserState> emit) {
     try {
       final users = userBox.values.toList();
-      emit(UsersLoaded(users));
+      emit(UsersLoaded(users, dialogIsOpen: false));
     } catch (e) {
       emit(UserError('Не удалось загрузить пользователей'));
     }
@@ -58,7 +58,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       for (int notificationId in event.user.notificationIds) {
         await notificationService.cancelNotification(notificationId);
       }
-
       await userBox.delete(event.user.key);
       add(LoadUsers());
     } catch (e) {
@@ -75,26 +74,21 @@ class UserBloc extends Bloc<UserEvent, UserState> {
             user.patronymic.toLowerCase().contains(query) ||
             user.number.toLowerCase().contains(query))
         .toList();
-    emit(UsersLoaded(users));
+    emit(UsersLoaded(users, dialogIsOpen: false));
   }
 
   void _onSortUsers(SortUsersEvent event, Emitter<UserState> emit) {
-    final DateFormat inputFormat =
-        DateFormat('dd.MM.yyyy'); // Формат даты, как в вашей строке
+    final DateFormat inputFormat = DateFormat('dd.MM.yyyy');
     final users = userBox.values.toList();
 
     users.sort((a, b) {
       DateTime deviceDateA, deviceDateB, medicalDateA, medicalDateB;
 
       try {
-        deviceDateA =
-            inputFormat.parse(a.deviceDate); // Преобразуем строку в DateTime
-        deviceDateB =
-            inputFormat.parse(b.deviceDate); // Преобразуем строку в DateTime
-        medicalDateA =
-            inputFormat.parse(a.medicalBook); // Преобразуем строку в DateTime
-        medicalDateB =
-            inputFormat.parse(b.medicalBook); // Преобразуем строку в DateTime
+        deviceDateA = inputFormat.parse(a.deviceDate);
+        deviceDateB = inputFormat.parse(b.deviceDate);
+        medicalDateA = inputFormat.parse(a.medicalBook);
+        medicalDateB = inputFormat.parse(b.medicalBook);
       } catch (e) {
         emit(UserError('Ошибка парсинга даты: $e'));
         return 0;
@@ -102,27 +96,34 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
       switch (event.filterOption) {
         case 1:
-          return deviceDateB.compareTo(
-              deviceDateA); // Сортировка по дате устройства от большего к меньшему
+          return deviceDateB.compareTo(deviceDateA);
         case 2:
-          return deviceDateA.compareTo(
-              deviceDateB); // Сортировка по дате устройства от меньшего к большему
+          return deviceDateA.compareTo(deviceDateB);
         case 3:
-          return medicalDateB.compareTo(
-              medicalDateA); // Сортировка по дате мед книжки от большего к меньшему
+          return medicalDateB.compareTo(medicalDateA);
         case 4:
-          return medicalDateA.compareTo(
-              medicalDateB); // Сортировка по дате мед книжки от меньшего к большему
+          return medicalDateA.compareTo(medicalDateB);
         default:
           return 0;
       }
     });
 
-    // Обновляем Box с отсортированными пользователями, используя их оригинальные ключи
     for (var user in users) {
-      userBox.put(user.key, user); // Используем ключ для сохранения объектов
+      userBox.put(user.key, user);
     }
 
-    emit(UsersLoaded(users)); // Отправляем обновленный список
+    emit(UsersLoaded(users, dialogIsOpen: false));
+  }
+
+  void _onShowInfoDialog(ShowInfoDialogEvent event, Emitter<UserState> emit) {
+    if (state is UsersLoaded) {
+      emit((state as UsersLoaded).copyWith(dialogIsOpen: true));
+    }
+  }
+
+  void _onHideInfoDialog(HideInfoDialogEvent event, Emitter<UserState> emit) {
+    if (state is UsersLoaded) {
+      emit((state as UsersLoaded).copyWith(dialogIsOpen: false));
+    }
   }
 }

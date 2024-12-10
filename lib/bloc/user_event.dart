@@ -48,3 +48,7 @@ class SortUsersEvent extends UserEvent {
 }
 
 class PickImage extends UserEvent {}
+
+class ShowInfoDialogEvent extends UserEvent {}
+
+class HideInfoDialogEvent extends UserEvent {}

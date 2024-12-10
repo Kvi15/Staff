@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staff/home_page/adding_person_view.dart';
 import 'package:flutter_staff/home_page/search_utils.dart';
 import 'package:flutter_staff/home_page/user.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
 
 class AddingAPerson extends StatefulWidget {
   final Box<User> userBox;

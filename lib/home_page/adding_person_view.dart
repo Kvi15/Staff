@@ -69,24 +69,56 @@ class AddingPersonViewState extends State<AddingPersonView> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        body: Stack(
-          children: [
-            _buildBackground(),
-            CustomScrollView(
-              slivers: [
-                _buildSliverAppBar(),
-                SliverPadding(
-                  padding: const EdgeInsets.only(bottom: 65),
-                  sliver: _buildUserList(),
+    return BlocListener<UserBloc, UserState>(
+      listener: (context, state) {
+        if (state is ShowInfoDialogState) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Связь с разработчиком',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                content: const Text(
+                  'Обратитесь по адресу putslizox@gmail.com',
+                  style: TextStyle(fontSize: 16),
                 ),
-              ],
-            ),
-          ],
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Закрыть'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      context
+                          .read<UserBloc>()
+                          .add(LoadUsers()); // Возвращаем обычное состояние
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        } else if (state is HideInfoDialogState) {
+          Navigator.of(context).pop(); // Закрываем диалог
+        }
+      },
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          body: Stack(
+            children: [
+              _buildBackground(),
+              CustomScrollView(
+                slivers: [
+                  _buildSliverAppBar(),
+                  SliverPadding(
+                    padding: const EdgeInsets.only(bottom: 65),
+                    sliver: _buildUserList(),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          floatingActionButton: _buildFloatingActionButton(),
         ),
-        floatingActionButton: _buildFloatingActionButton(),
       ),
     );
   }
@@ -127,7 +159,7 @@ class AddingPersonViewState extends State<AddingPersonView> {
         title: Column(
           children: [
             const Spacer(),
-            _buildInfoButton(),
+            _buildInfoButton(context),
             _buildSearchAndFilterRow(),
           ],
         ),
@@ -135,7 +167,7 @@ class AddingPersonViewState extends State<AddingPersonView> {
     );
   }
 
-  Widget _buildInfoButton() {
+  Widget _buildInfoButton(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -143,7 +175,9 @@ class AddingPersonViewState extends State<AddingPersonView> {
           icon: const Icon(Icons.info_outline, size: 20),
           color: Colors.black,
           iconSize: 30,
-          onPressed: _showInfoDialog,
+          onPressed: () {
+            context.read<UserBloc>().add(ShowInfoDialogEvent());
+          },
         ),
       ],
     );
@@ -270,30 +304,6 @@ class AddingPersonViewState extends State<AddingPersonView> {
     );
   }
 
-  void _showInfoDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Связь с разработчиком',
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          content: const Text(
-            'Обратитесь по адресу putslizox@gmail.com',
-            style: TextStyle(fontSize: 16),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Закрыть'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   Future<void> _showAddUserForm() async {
     final User? newUser = await showModalBottomSheet<User>(
       isScrollControlled: true,
@@ -305,7 +315,7 @@ class AddingPersonViewState extends State<AddingPersonView> {
             topRight: Radius.circular(25),
           ),
           child: FractionallySizedBox(
-            heightFactor: 0.53,
+            heightFactor: 0.65,
             child: TextForm(
               onEmployeeAdded: widget.addUser,
             ),

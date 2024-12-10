@@ -57,22 +57,24 @@ class TextFormBody extends StatelessWidget {
               'Регистрация нового сотрудника',
               style: TextStyle(fontSize: 21, color: Colors.black),
             ),
-            IconButton(
-              onPressed: () {
-                context.read<UserBloc>().add(
-                      SaveUserEvent(
-                        surname: surnameController.text,
-                        name: nameController.text,
-                        patronymic: patronymicController.text,
-                        number: numberController.text,
-                        deviceDate: deviceDateController.text,
-                        medicalBook: medicalBookController.text,
-                        imagePath: image?.path,
-                      ),
-                    );
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.save, size: 35),
+            Expanded(
+              child: IconButton(
+                onPressed: () {
+                  context.read<UserBloc>().add(
+                        SaveUserEvent(
+                          surname: surnameController.text,
+                          name: nameController.text,
+                          patronymic: patronymicController.text,
+                          number: numberController.text,
+                          deviceDate: deviceDateController.text,
+                          medicalBook: medicalBookController.text,
+                          imagePath: image?.path,
+                        ),
+                      );
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.save, size: 35),
+              ),
             ),
           ],
         ),
