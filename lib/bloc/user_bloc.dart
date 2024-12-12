@@ -81,37 +81,54 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     final DateFormat inputFormat = DateFormat('dd.MM.yyyy');
     final users = userBox.values.toList();
 
-    users.sort((a, b) {
-      DateTime deviceDateA, deviceDateB, medicalDateA, medicalDateB;
-
+    bool _isValidDate(String date) {
       try {
+        inputFormat.parse(date);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    users.sort((a, b) {
+      DateTime deviceDateA = DateTime(1900); // Дата по умолчанию
+      DateTime deviceDateB = DateTime(1900);
+      DateTime medicalDateA = DateTime(1900);
+      DateTime medicalDateB = DateTime(1900);
+
+      // Парсим даты устройства
+      if (_isValidDate(a.deviceDate)) {
         deviceDateA = inputFormat.parse(a.deviceDate);
+      }
+      if (_isValidDate(b.deviceDate)) {
         deviceDateB = inputFormat.parse(b.deviceDate);
-        medicalDateA = inputFormat.parse(a.medicalBook);
-        medicalDateB = inputFormat.parse(b.medicalBook);
-      } catch (e) {
-        emit(UserError('Ошибка парсинга даты: $e'));
-        return 0;
       }
 
+      // Парсим даты медкнижки
+      if (_isValidDate(a.medicalBook)) {
+        medicalDateA = inputFormat.parse(a.medicalBook);
+      }
+      if (_isValidDate(b.medicalBook)) {
+        medicalDateB = inputFormat.parse(b.medicalBook);
+      }
+
+      // Сортировка по выбранному фильтру
       switch (event.filterOption) {
-        case 1:
+        case 1: // Сначала новый сотрудник
           return deviceDateB.compareTo(deviceDateA);
-        case 2:
+        case 2: // Сначала старый сотрудник
           return deviceDateA.compareTo(deviceDateB);
-        case 3:
+        case 3: // Сначала новая книжка
           return medicalDateB.compareTo(medicalDateA);
-        case 4:
+        case 4: // Сначала старая книжка
           return medicalDateA.compareTo(medicalDateB);
         default:
+          emit(UserError('Неизвестный параметр сортировки.'));
           return 0;
       }
     });
 
-    for (var user in users) {
-      userBox.put(user.key, user);
-    }
-
+    // Обновляем состояние с отсортированным списком
     emit(UsersLoaded(users, dialogIsOpen: false));
   }
 
