@@ -13,8 +13,8 @@ class TextFormBody extends StatelessWidget {
   final TextEditingController numberController;
   final TextEditingController deviceDateController;
   final TextEditingController medicalBookController;
-  final Future<void> Function() onPickImage; // Изменено на Future<void>
-  final Future<void> Function() onSave; // Изменено на Future<void>
+  final Future<void> Function() onPickImage;
+  final Future<void> Function() onSave;
   final XFile? image;
 
   const TextFormBody({
@@ -50,38 +50,33 @@ class TextFormBody extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Регистрация нового сотрудника',
-              style: TextStyle(fontSize: 21, color: Colors.black),
-            ),
-            Expanded(
-              child: IconButton(
-                onPressed: () {
-                  context.read<UserBloc>().add(
-                        SaveUserEvent(
-                          surname: surnameController.text,
-                          name: nameController.text,
-                          patronymic: patronymicController.text,
-                          number: numberController.text,
-                          deviceDate: deviceDateController.text,
-                          medicalBook: medicalBookController.text,
-                          imagePath: image?.path,
-                        ),
-                      );
-                  Navigator.of(context).pop();
-                },
-                icon: const Icon(Icons.save, size: 35),
-              ),
-            ),
-          ],
+        title: const Text(
+          'Регистрация нового сотрудника',
+          style: TextStyle(fontSize: 18, color: Colors.black),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              context.read<UserBloc>().add(
+                    SaveUserEvent(
+                      surname: surnameController.text,
+                      name: nameController.text,
+                      patronymic: patronymicController.text,
+                      number: numberController.text,
+                      deviceDate: deviceDateController.text,
+                      medicalBook: medicalBookController.text,
+                      imagePath: image?.path,
+                    ),
+                  );
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.save, size: 30),
+          ),
+        ],
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(25, 5, 25, 0),
+        padding: const EdgeInsets.fromLTRB(25, 5, 25, 10),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[

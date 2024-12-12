@@ -68,7 +68,11 @@ class AddingPersonViewState extends State<AddingPersonView> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return BlocListener<UserBloc, UserState>(
       listener: (context, state) {
         if (state is UsersLoaded && state.dialogIsOpen) {
@@ -106,7 +110,7 @@ class AddingPersonViewState extends State<AddingPersonView> {
               _buildBackground(),
               CustomScrollView(
                 slivers: [
-                  _buildSliverAppBar(),
+                  _buildSliverAppBar(screenWidth, screenHeight),
                   SliverPadding(
                     padding: const EdgeInsets.only(bottom: 65),
                     sliver: _buildUserList(),
@@ -147,17 +151,19 @@ class AddingPersonViewState extends State<AddingPersonView> {
     );
   }
 
-  Widget _buildSliverAppBar() {
+  Widget _buildSliverAppBar(double screenWidth, double screenHeight) {
     return SliverAppBar(
-      expandedHeight: 300,
+      expandedHeight: screenHeight * 0.4,
       backgroundColor: Colors.transparent,
       elevation: 0,
       flexibleSpace: FlexibleSpaceBar(
         centerTitle: true,
         title: Column(
           children: [
-            const Spacer(),
-            _buildInfoButton(context),
+            Spacer(),
+            _buildInfoButton(
+              context,
+            ),
             _buildSearchAndFilterRow(),
           ],
         ),
@@ -165,7 +171,9 @@ class AddingPersonViewState extends State<AddingPersonView> {
     );
   }
 
-  Widget _buildInfoButton(BuildContext context) {
+  Widget _buildInfoButton(
+    BuildContext context,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
