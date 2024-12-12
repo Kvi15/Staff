@@ -15,6 +15,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       : super(UsersLoading()) {
     on<LoadUsers>(_onLoadUsers);
     on<SaveUserEvent>(_onSaveUser);
+    on<EditUser>(_onEditUser);
     on<DeleteUser>(_onDeleteUser);
     on<SearchUsersEvent>(_onSearchUsers);
     on<SortUsersEvent>(_onSortUsers);
@@ -25,6 +26,25 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   void _onLoadUsers(LoadUsers event, Emitter<UserState> emit) {
     try {
       final users = userBox.values.toList();
+
+      // Сортировка по умолчанию: сначала новый сотрудник
+      users.sort((a, b) {
+        final DateFormat inputFormat = DateFormat('dd.MM.yyyy');
+        DateTime deviceDateA = DateTime(1900);
+        DateTime deviceDateB = DateTime(1900);
+
+        try {
+          if (a.deviceDate.isNotEmpty) {
+            deviceDateA = inputFormat.parse(a.deviceDate);
+          }
+          if (b.deviceDate.isNotEmpty) {
+            deviceDateB = inputFormat.parse(b.deviceDate);
+          }
+        } catch (_) {}
+
+        return deviceDateB.compareTo(deviceDateA);
+      });
+
       emit(UsersLoaded(users, dialogIsOpen: false));
     } catch (e) {
       emit(UserError('Не удалось загрузить пользователей'));
@@ -47,9 +67,25 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
       await userBox.add(newUser);
       NotificationHelper.scheduleNotificationsForUser(newUser);
+
+      // Загружаем пользователей с сортировкой по умолчанию
       add(LoadUsers());
     } catch (e) {
       emit(UserError('Не удалось сохранить пользователя'));
+    }
+  }
+
+  Future<void> _onEditUser(EditUser event, Emitter<UserState> emit) async {
+    try {
+      final user = event.user;
+
+      // Сохраняем изменения пользователя
+      await user.save();
+
+      // Загружаем пользователей с сортировкой по умолчанию
+      add(LoadUsers());
+    } catch (e) {
+      emit(UserError('Не удалось обновить данные пользователя'));
     }
   }
 
@@ -128,7 +164,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       }
     });
 
-    // Обновляем состояние с отсортированным списком
     emit(UsersLoaded(users, dialogIsOpen: false));
   }
 
