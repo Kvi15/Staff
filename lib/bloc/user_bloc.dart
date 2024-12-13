@@ -117,7 +117,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     final DateFormat inputFormat = DateFormat('dd.MM.yyyy');
     final users = userBox.values.toList();
 
-    bool _isValidDate(String date) {
+    bool isValidDate(String date) {
       try {
         inputFormat.parse(date);
         return true;
@@ -133,18 +133,18 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       DateTime medicalDateB = DateTime(1900);
 
       // Парсим даты устройства
-      if (_isValidDate(a.deviceDate)) {
+      if (isValidDate(a.deviceDate)) {
         deviceDateA = inputFormat.parse(a.deviceDate);
       }
-      if (_isValidDate(b.deviceDate)) {
+      if (isValidDate(b.deviceDate)) {
         deviceDateB = inputFormat.parse(b.deviceDate);
       }
 
       // Парсим даты медкнижки
-      if (_isValidDate(a.medicalBook)) {
+      if (isValidDate(a.medicalBook)) {
         medicalDateA = inputFormat.parse(a.medicalBook);
       }
-      if (_isValidDate(b.medicalBook)) {
+      if (isValidDate(b.medicalBook)) {
         medicalDateB = inputFormat.parse(b.medicalBook);
       }
 
